@@ -1,8 +1,8 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "CEX Aggregator Service",
-    "description": "API documentation for the CEX Aggregator Service, including external and internal endpoints.",
+    "title": "CEX Aggregator Service API",
+    "description": "API documentation for the CEX Aggregator Service, including external endpoints for digital asset management, swaps, deposits, payouts, and quotes.",
     "version": "1.0.0",
     "contact": {
       "name": "API Support"
@@ -14,7 +14,7 @@
       "description": "API Server",
       "variables": {
         "baseUrl": {
-          "default": "https://api-sandbox.durian-x..com",
+          "default": "https://api-sandbox.durian-x.com",
           "description": "Base URL for the API"
         }
       }
@@ -48,46 +48,115 @@
       }
     },
     "schemas": {
+      "AccessTokenRequest": {
+        "type": "object",
+        "required": ["grantType"],
+        "properties": {
+          "grantType": {
+            "type": "string",
+            "enum": ["client_credentials"],
+            "example": "client_credentials"
+          }
+        }
+      },
+      "AccessTokenResponse": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          }
+        }
+      },
       "Asset": {
         "type": "object",
         "properties": {
           "code": {
             "type": "string",
-            "example": "BTC"
+            "example": "USDT"
           },
           "name": {
             "type": "string",
-            "example": "Bitcoin"
+            "example": "Tether"
           },
           "type": {
             "type": "string",
-            "enum": [
-              "DIGITAL",
-              "FIAT"
-            ],
+            "enum": ["DIGITAL", "FIAT"],
             "example": "DIGITAL"
           },
-          "precision": {
-            "type": "integer",
-            "example": 8
+          "networks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": ["ERC20", "TRC20"]
           }
         }
       },
-      "AssetUpdate": {
+      "Account": {
         "type": "object",
         "properties": {
-          "name": {
+          "id": {
             "type": "string",
-            "example": "Bitcoin Core"
+            "format": "uuid",
+            "example": "019b968c-2bee-73f3-a7dd-c82f3a8558f7"
+          },
+          "asset": {
+            "type": "string",
+            "example": "USDT"
+          },
+          "balance": {
+            "type": "string",
+            "example": "1000.50"
+          },
+          "availableBalance": {
+            "type": "string",
+            "example": "900.50"
+          },
+          "lockedBalance": {
+            "type": "string",
+            "example": "100.00"
           }
         }
       },
-      "DepositAddress": {
+      "Deposit": {
         "type": "object",
-        "required": [
-          "asset",
-          "network"
-        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "019b9b87-463a-7195-9641-2dd4eb3c862e"
+          },
+          "asset": {
+            "type": "string",
+            "example": "USDT"
+          },
+          "network": {
+            "type": "string",
+            "example": "ERC20"
+          },
+          "amount": {
+            "type": "string",
+            "example": "100.00"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "completed", "failed"],
+            "example": "completed"
+          },
+          "address": {
+            "type": "string",
+            "example": "0x1234567890abcdef..."
+          },
+          "txHash": {
+            "type": "string",
+            "example": "0xabcdef1234567890..."
+          }
+        }
+      },
+      "DepositAddressRequest": {
+        "type": "object",
+        "required": ["asset", "network"],
         "properties": {
           "asset": {
             "type": "string",
@@ -99,13 +168,65 @@
           }
         }
       },
+      "DepositAddressResponse": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string",
+            "example": "0x1234567890abcdef..."
+          },
+          "asset": {
+            "type": "string",
+            "example": "USDT"
+          },
+          "network": {
+            "type": "string",
+            "example": "ERC20"
+          },
+          "memo": {
+            "type": "string",
+            "example": "123456"
+          }
+        }
+      },
       "Quote": {
         "type": "object",
-        "required": [
-          "sourceAsset",
-          "destinationAsset",
-          "sourceAmount"
-        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "019bb30b-53e0-7183-afe9-17bdaf2209d8"
+          },
+          "sourceAsset": {
+            "type": "string",
+            "example": "USDT"
+          },
+          "destinationAsset": {
+            "type": "string",
+            "example": "IDR"
+          },
+          "sourceAmount": {
+            "type": "string",
+            "example": "100.00"
+          },
+          "destinationAmount": {
+            "type": "string",
+            "example": "1500000.00"
+          },
+          "exchangeRate": {
+            "type": "string",
+            "example": "15000.00"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-27T10:30:00Z"
+          }
+        }
+      },
+      "QuoteRequest": {
+        "type": "object",
+        "required": ["sourceAsset", "destinationAsset", "sourceAmount"],
         "properties": {
           "sourceAsset": {
             "type": "string",
@@ -117,20 +238,58 @@
           },
           "sourceAmount": {
             "type": "string",
-            "example": "1"
+            "example": "100.00"
           }
         }
       },
       "Swap": {
         "type": "object",
-        "required": [
-          "quoteId",
-          "referenceId"
-        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "019bbbe6-3672-73fb-a8f7-32442be7b39c"
+          },
+          "quoteId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "019bb30b-53e0-7183-afe9-17bdaf2209d8"
+          },
+          "referenceId": {
+            "type": "string",
+            "example": "mex-ref-1230-test-1"
+          },
+          "sourceAsset": {
+            "type": "string",
+            "example": "USDT"
+          },
+          "destinationAsset": {
+            "type": "string",
+            "example": "IDR"
+          },
+          "sourceAmount": {
+            "type": "string",
+            "example": "100.00"
+          },
+          "destinationAmount": {
+            "type": "string",
+            "example": "1500000.00"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "completed", "failed"],
+            "example": "completed"
+          }
+        }
+      },
+      "SwapRequest": {
+        "type": "object",
+        "required": ["quoteId", "referenceId"],
         "properties": {
           "quoteId": {
             "type": "string",
-            "example": "019bbbe6-3672-73fb-a8f7-32442be7b39c"
+            "format": "uuid",
+            "example": "019bb30b-53e0-7183-afe9-17bdaf2209d8"
           },
           "referenceId": {
             "type": "string",
@@ -140,14 +299,52 @@
       },
       "Payout": {
         "type": "object",
-        "required": [
-          "referenceId",
-          "sourceAccountId",
-          "recipientId",
-          "asset",
-          "network",
-          "amount"
-        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "019bc123-4567-7890-abcd-ef1234567890"
+          },
+          "referenceId": {
+            "type": "string",
+            "example": "mexreference_123"
+          },
+          "sourceAccountId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "10000000-0000-0000-0000-000000000001"
+          },
+          "recipientId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "60000000-0000-0000-0000-000000000001"
+          },
+          "asset": {
+            "type": "string",
+            "example": "USDT"
+          },
+          "network": {
+            "type": "string",
+            "example": "TRC20"
+          },
+          "amount": {
+            "type": "string",
+            "example": "10.23"
+          },
+          "remarks": {
+            "type": "string",
+            "example": "note of transaction"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "processing", "completed", "failed"],
+            "example": "completed"
+          }
+        }
+      },
+      "PayoutRequest": {
+        "type": "object",
+        "required": ["referenceId", "sourceAccountId", "recipientId", "asset", "network", "amount"],
         "properties": {
           "referenceId": {
             "type": "string",
@@ -155,10 +352,12 @@
           },
           "sourceAccountId": {
             "type": "string",
+            "format": "uuid",
             "example": "10000000-0000-0000-0000-000000000001"
           },
           "recipientId": {
             "type": "string",
+            "format": "uuid",
             "example": "60000000-0000-0000-0000-000000000001"
           },
           "asset": {
@@ -181,15 +380,12 @@
       },
       "Recipient": {
         "type": "object",
-        "required": [
-          "asset",
-          "network",
-          "address",
-          "recipientName",
-          "recipientAddress",
-          "type"
-        ],
         "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "60000000-0000-0000-0000-000000000001"
+          },
           "asset": {
             "type": "string",
             "example": "USDT"
@@ -200,7 +396,7 @@
           },
           "address": {
             "type": "string",
-            "example": 11259375
+            "example": "0x0abcdef"
           },
           "memo": {
             "type": "string",
@@ -220,35 +416,68 @@
           },
           "type": {
             "type": "string",
-            "enum": [
-              "individual",
-              "business"
-            ],
+            "enum": ["individual", "business"],
             "example": "individual"
           }
         }
       },
-      "AccessTokenRequest": {
+      "RecipientRequest": {
         "type": "object",
-        "required": [
-          "grantType"
-        ],
+        "required": ["asset", "network", "address", "recipientName", "recipientAddress", "type"],
         "properties": {
-          "grantType": {
+          "asset": {
             "type": "string",
-            "enum": [
-              "client_credentials"
-            ],
-            "example": "client_credentials"
+            "example": "USDT"
+          },
+          "network": {
+            "type": "string",
+            "example": "TRC20"
+          },
+          "address": {
+            "type": "string",
+            "example": "0x0abcdef"
+          },
+          "memo": {
+            "type": "string",
+            "example": "memo-123"
+          },
+          "recipientName": {
+            "type": "string",
+            "example": "John Doe"
+          },
+          "recipientAddress": {
+            "type": "string",
+            "example": "Jl. Mawar I, Jakarta Selatan 12345"
+          },
+          "alias": {
+            "type": "string",
+            "example": "custom-name"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["individual", "business"],
+            "example": "individual"
           }
         }
       },
-      "AccessTokenResponse": {
+      "TradingPair": {
         "type": "object",
         "properties": {
-          "accessToken": {
+          "sourceAsset": {
             "type": "string",
-            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            "example": "USDT"
+          },
+          "destinationAsset": {
+            "type": "string",
+            "example": "IDR"
+          },
+          "minAmount": {
+            "type": "string",
+            "example": "1.00"
+          },
+          "maxAmount": {
+            "type": "string",
+            "example": "100000.00"
           }
         }
       },
@@ -256,46 +485,42 @@
         "type": "object",
         "properties": {
           "error": {
-            "type": "string"
+            "type": "string",
+            "example": "invalid_request"
           },
           "message": {
-            "type": "string"
+            "type": "string",
+            "example": "Invalid request parameters"
           },
           "code": {
-            "type": "string"
+            "type": "string",
+            "example": "ERR_001"
           }
         }
       }
     },
     "parameters": {
-      "assetCodeParam": {
-        "name": "assetCode",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string"
-        },
-        "description": "Asset code (e.g., BTC, USDT)"
-      },
-      "networkCodeParam": {
-        "name": "networkCode",
-        "in": "path",
-        "required": true,
-        "schema": {
-          "type": "string"
-        },
-        "description": "Network code (e.g., ERC20, TRC20)"
-      },
       "idParam": {
         "name": "id",
         "in": "path",
         "required": true,
         "schema": {
-          "type": "string"
+          "type": "string",
+          "format": "uuid"
         },
         "description": "Resource ID"
       },
-      "assetQueryParam": {
+      "accountIdParam": {
+        "name": "accountId",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "description": "Filter by account ID",
+        "example": "019b968c-2bee-7613-8307-037bc66e75c9"
+      },
+      "assetParam": {
         "name": "asset",
         "in": "query",
         "schema": {
@@ -304,21 +529,23 @@
         "description": "Filter by asset code",
         "example": "USDT"
       },
-      "networkQueryParam": {
+      "networkParam": {
         "name": "network",
         "in": "query",
         "schema": {
           "type": "string"
         },
         "description": "Filter by network",
-        "example": "TRC20"
+        "example": "ERC20"
       },
       "limitParam": {
         "name": "limit",
         "in": "query",
         "schema": {
           "type": "integer",
-          "default": 10
+          "default": 10,
+          "minimum": 1,
+          "maximum": 100
         },
         "description": "Number of items to return"
       },
@@ -327,7 +554,8 @@
         "in": "query",
         "schema": {
           "type": "integer",
-          "default": 0
+          "default": 0,
+          "minimum": 0
         },
         "description": "Number of items to skip"
       },
@@ -336,55 +564,19 @@
         "in": "query",
         "schema": {
           "type": "integer",
-          "default": 1
+          "default": 1,
+          "minimum": 1
         },
         "description": "Page number"
-      },
-      "accountIdParam": {
-        "name": "accountId",
-        "in": "query",
-        "schema": {
-          "type": "string"
-        },
-        "description": "Filter by account ID"
       }
     }
   },
   "paths": {
-    "/health": {
-      "get": {
-        "tags": [
-          "Health"
-        ],
-        "summary": "Health Check",
-        "description": "Check the health status of the service",
-        "responses": {
-          "200": {
-            "description": "Service is healthy",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "example": "ok"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/v1.0/access-token": {
       "post": {
-        "tags": [
-          "Authentication"
-        ],
+        "tags": ["Authentication"],
         "summary": "Generate Access Token",
-        "description": "Generate an access token using client credentials",
+        "description": "Generate an access token using client credentials with RSA signature authentication",
         "security": [
           {
             "clientIdAuth": [],
@@ -414,7 +606,7 @@
             }
           },
           "401": {
-            "description": "Unauthorized",
+            "description": "Unauthorized - Invalid credentials or signature",
             "content": {
               "application/json": {
                 "schema": {
@@ -426,100 +618,11 @@
         }
       }
     },
-    "/v1.0/accounts": {
-      "get": {
-        "tags": [
-          "Accounts"
-        ],
-        "summary": "Get Account Balance",
-        "description": "Retrieve account balance, optionally filtered by asset",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/assetQueryParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Account balance retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        }
-      }
-    },
-    "/v1.0/accounts/{id}": {
-      "get": {
-        "tags": [
-          "Accounts"
-        ],
-        "summary": "Get Account Balance By ID",
-        "description": "Retrieve account balance for a specific account ID",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/idParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Account balance retrieved successfully"
-          },
-          "404": {
-            "description": "Account not found"
-          }
-        }
-      }
-    },
-    "/v1.0/accounts/ledgers": {
-      "get": {
-        "tags": [
-          "Accounts"
-        ],
-        "summary": "Get Account Ledger",
-        "description": "Retrieve account ledger transactions",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Account ledger retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/v1.0/assets": {
       "get": {
-        "tags": [
-          "Assets"
-        ],
-        "summary": "List Assets",
-        "description": "Retrieve list of available assets",
+        "tags": ["Supporting Information"],
+        "summary": "Get Supported Digital Assets",
+        "description": "Retrieve list of supported digital assets with optional filters",
         "security": [
           {
             "bearerAuth": []
@@ -528,6 +631,12 @@
         "parameters": [
           {
             "$ref": "#/components/parameters/accountIdParam"
+          },
+          {
+            "$ref": "#/components/parameters/assetParam"
+          },
+          {
+            "$ref": "#/components/parameters/networkParam"
           }
         ],
         "responses": {
@@ -543,17 +652,25 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
     },
     "/v1.0/pairs": {
       "get": {
-        "tags": [
-          "Trading Pairs"
-        ],
-        "summary": "List Pairs",
-        "description": "Retrieve list of available trading pairs",
+        "tags": ["Supporting Information"],
+        "summary": "Get Supported Swap Pairs",
+        "description": "Retrieve list of supported trading/swap pairs",
         "security": [
           {
             "bearerAuth": []
@@ -567,8 +684,83 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "type": "object"
+                    "$ref": "#/components/schemas/TradingPair"
                   }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/v1.0/accounts": {
+      "get": {
+        "tags": ["Accounts"],
+        "summary": "Get Accounts",
+        "description": "Retrieve all accounts with their balances",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Accounts retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Account"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/v1.0/accounts/{id}": {
+      "get": {
+        "tags": ["Accounts"],
+        "summary": "Get Account by ID",
+        "description": "Retrieve a specific account by its ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/idParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Account retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Account"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Account not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
@@ -576,11 +768,44 @@
         }
       }
     },
+    "/v1.0/accounts/ledgers": {
+      "get": {
+        "tags": ["Accounts"],
+        "summary": "Get Account Ledger",
+        "description": "Retrieve account ledger transactions",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Account ledger retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ledgers": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/v1.0/deposits": {
       "get": {
-        "tags": [
-          "Deposits"
-        ],
+        "tags": ["Deposits"],
         "summary": "List Deposits",
         "description": "Retrieve list of deposits with optional filters",
         "security": [
@@ -590,10 +815,10 @@
         ],
         "parameters": [
           {
-            "$ref": "#/components/parameters/assetQueryParam"
+            "$ref": "#/components/parameters/assetParam"
           },
           {
-            "$ref": "#/components/parameters/networkQueryParam"
+            "$ref": "#/components/parameters/networkParam"
           },
           {
             "$ref": "#/components/parameters/limitParam"
@@ -608,19 +833,31 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "deposits": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Deposit"
+                      }
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
     },
     "/v1.0/deposits/{id}": {
       "get": {
-        "tags": [
-          "Deposits"
-        ],
+        "tags": ["Deposits"],
         "summary": "Get Deposit by ID",
         "description": "Retrieve a specific deposit by its ID",
         "security": [
@@ -635,7 +872,17 @@
         ],
         "responses": {
           "200": {
-            "description": "Deposit retrieved successfully"
+            "description": "Deposit retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Deposit"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Deposit not found"
@@ -645,9 +892,7 @@
     },
     "/v1.0/deposits/addresses": {
       "post": {
-        "tags": [
-          "Deposits"
-        ],
+        "tags": ["Deposits"],
         "summary": "Create Deposit Address",
         "description": "Create a new deposit address for a specific asset and network",
         "security": [
@@ -662,20 +907,16 @@
             "schema": {
               "type": "string"
             },
-            "description": "Sandbox deposit amount (for testing)"
+            "description": "Sandbox deposit amount (for testing purposes)"
           },
           {
             "name": "X-SANDBOX-SIMULATE",
             "in": "header",
             "schema": {
               "type": "string",
-              "enum": [
-                "completed",
-                "pending",
-                "failed"
-              ]
+              "enum": ["completed", "pending", "failed"]
             },
-            "description": "Simulate deposit status (for testing)"
+            "description": "Simulate deposit status (for testing purposes)"
           }
         ],
         "requestBody": {
@@ -683,7 +924,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DepositAddress"
+                "$ref": "#/components/schemas/DepositAddressRequest"
               }
             }
           }
@@ -694,19 +935,74 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/DepositAddressResponse"
                 }
               }
             }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
     },
     "/v1.0/payouts": {
-      "post": {
-        "tags": [
-          "Payouts"
+      "get": {
+        "tags": ["Payouts"],
+        "summary": "List Payouts",
+        "description": "Retrieve list of payout transactions",
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/limitParam"
+          },
+          {
+            "$ref": "#/components/parameters/offsetParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payouts retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "payouts": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Payout"
+                      }
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Payouts"],
         "summary": "Create Payout",
         "description": "Create a new payout transaction",
         "security": [
@@ -719,7 +1015,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Payout"
+                "$ref": "#/components/schemas/PayoutRequest"
               }
             }
           }
@@ -730,22 +1026,65 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/Payout"
                 }
               }
             }
           },
           "400": {
-            "description": "Invalid request"
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/v1.0/payouts/{id}": {
+      "get": {
+        "tags": ["Payouts"],
+        "summary": "Get Payout by ID",
+        "description": "Retrieve a specific payout by its ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/idParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payout retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Payout"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Payout not found"
           }
         }
       }
     },
     "/v1.0/quotes": {
       "get": {
-        "tags": [
-          "Quotes"
-        ],
+        "tags": ["Quotes"],
         "summary": "List Quotes",
         "description": "Retrieve list of quotes",
         "security": [
@@ -767,20 +1106,29 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "quotes": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Quote"
+                      }
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
                   }
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       },
       "post": {
-        "tags": [
-          "Quotes"
-        ],
+        "tags": ["Quotes"],
         "summary": "Create Quote",
         "description": "Create a new quote for asset exchange",
         "security": [
@@ -793,7 +1141,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Quote"
+                "$ref": "#/components/schemas/QuoteRequest"
               }
             }
           }
@@ -804,19 +1152,30 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/Quote"
                 }
               }
             }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
     },
     "/v1.0/quotes/{id}": {
       "get": {
-        "tags": [
-          "Quotes"
-        ],
+        "tags": ["Quotes"],
         "summary": "Get Quote by ID",
         "description": "Retrieve a specific quote by its ID",
         "security": [
@@ -831,7 +1190,17 @@
         ],
         "responses": {
           "200": {
-            "description": "Quote retrieved successfully"
+            "description": "Quote retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Quote"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Quote not found"
@@ -839,111 +1208,9 @@
         }
       }
     },
-    "/v1.0/swaps": {
-      "get": {
-        "tags": [
-          "Swaps"
-        ],
-        "summary": "List Swaps",
-        "description": "Retrieve list of swap transactions",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Swaps retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Swaps"
-        ],
-        "summary": "Create Swap",
-        "description": "Create a new swap transaction based on a quote",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "X-SANDBOX-ERROR",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Simulate error (for testing)"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Swap"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Swap created successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1.0/swaps/{id}": {
-      "get": {
-        "tags": [
-          "Swaps"
-        ],
-        "summary": "Get Swap by ID",
-        "description": "Retrieve a specific swap by its ID",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/idParam"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Swap retrieved successfully"
-          },
-          "404": {
-            "description": "Swap not found"
-          }
-        }
-      }
-    },
     "/v1.0/recipients": {
       "get": {
-        "tags": [
-          "Recipients"
-        ],
+        "tags": ["Recipients"],
         "summary": "List Recipients",
         "description": "Retrieve list of recipients",
         "security": [
@@ -964,13 +1231,14 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       },
       "post": {
-        "tags": [
-          "Recipients"
-        ],
+        "tags": ["Recipients"],
         "summary": "Create Recipient",
         "description": "Create a new recipient for payouts",
         "security": [
@@ -983,7 +1251,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Recipient"
+                "$ref": "#/components/schemas/RecipientRequest"
               }
             }
           }
@@ -994,69 +1262,194 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/Recipient"
                 }
               }
             }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
     },
-    "/v1.0/webhooks/provider/mobee/deposit": {
-      "post": {
-        "tags": [
-          "Webhooks"
+    "/v1.0/recipients/{id}": {
+      "get": {
+        "tags": ["Recipients"],
+        "summary": "Get Recipient by ID",
+        "description": "Retrieve a specific recipient by its ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
-        "summary": "Mobee Deposit Webhook",
-        "description": "Webhook endpoint for Mobee deposit notifications",
         "parameters": [
           {
-            "name": "X-WEBHOOK-TOKEN",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Webhook authentication token"
+            "$ref": "#/components/parameters/idParam"
           }
         ],
         "responses": {
           "200": {
-            "description": "Webhook processed successfully"
+            "description": "Recipient retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Recipient"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Recipient not found"
           }
         }
       }
     },
-    "/v1.0/webhook/provider/{provider_id}/withdraw-fiat": {
-      "post": {
-        "tags": [
-          "Webhooks"
+    "/v1.0/swaps": {
+      "get": {
+        "tags": ["Swaps"],
+        "summary": "List Swaps",
+        "description": "Retrieve list of swap transactions",
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
-        "summary": "Withdraw Fiat Webhook",
-        "description": "Webhook endpoint for fiat withdrawal notifications",
         "parameters": [
           {
-            "name": "provider_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "example": "mobee"
+            "$ref": "#/components/parameters/limitParam"
           },
           {
-            "name": "X-WEBHOOK-TOKEN",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "Webhook authentication token"
+            "$ref": "#/components/parameters/offsetParam"
           }
         ],
         "responses": {
           "200": {
-            "description": "Webhook processed successfully"
+            "description": "Swaps retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "swaps": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Swap"
+                      }
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Swaps"],
+        "summary": "Create Swap",
+        "description": "Create a new swap transaction based on a quote",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-SANDBOX-ERROR",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Simulate error (for testing purposes)"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwapRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Swap created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Swap"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/v1.0/swaps/{id}": {
+      "get": {
+        "tags": ["Swaps"],
+        "summary": "Get Swap by ID",
+        "description": "Retrieve a specific swap by its ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/idParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Swap retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Swap"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Swap not found"
           }
         }
       }
@@ -1064,24 +1457,16 @@
   },
   "tags": [
     {
-      "name": "Health",
-      "description": "Health check endpoints"
-    },
-    {
       "name": "Authentication",
       "description": "Authentication and access token management"
     },
     {
+      "name": "Supporting Information",
+      "description": "Supporting information endpoints for assets and trading pairs"
+    },
+    {
       "name": "Accounts",
       "description": "Account balance and ledger operations"
-    },
-    {
-      "name": "Assets",
-      "description": "Asset management operations"
-    },
-    {
-      "name": "Trading Pairs",
-      "description": "Trading pair information"
     },
     {
       "name": "Deposits",
@@ -1096,16 +1481,12 @@
       "description": "Quote creation and management for asset exchanges"
     },
     {
-      "name": "Swaps",
-      "description": "Swap transaction operations"
-    },
-    {
       "name": "Recipients",
       "description": "Recipient management for payouts"
     },
     {
-      "name": "Webhooks",
-      "description": "Webhook endpoints for provider notifications"
+      "name": "Swaps",
+      "description": "Swap transaction operations"
     }
   ]
 }
