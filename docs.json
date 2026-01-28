@@ -12,26 +12,17 @@
     "tabs": [
       {
         "tab": "Guides",
-        "groups": [
-          {
-            "group": "Getting started",
-            "pages": [
-              "index",
-              "quickstart",
-              "development"
-            ]
-          }
+        "pages": [
+          "index",
+          "development",
+          "quickstart",
+          "guides/go-live-checklist"
         ]
       },
       {
         "tab": "API reference",
-        "groups": [
-          {
-            "group": "API documentation",
-            "pages": [
-              "api-reference/introduction"
-            ]
-          },
+        "pages": [
+          "api-reference/introduction",
           {
             "group": "API Reference",
             "openapi": "openapi.json"
