@@ -1,0 +1,79 @@
+---
+title: "Integration Guide"
+description: "This page will explain the integration steps/ information for you to implement our API efficiently"
+---
+
+## Integration Overview
+
+- We  currently provide REST API with OAuth 2.0 for authorization.
+- We differentiate between sandbox & production API so you can safely test your implementation in sandbox mode. Sandbox environment will not initiate any real transaction and it's designed for testing purposes. Sandbox Base URL: https://api-sandbox.durian-x.com/v1.0
+- Credentials needed for integration:
+  - Sandbox Account - you can request account creation via our BD team \<TBC Email\>. After account creation we will share to you
+    - **Sandbox X-CLIENT-ID**
+    - **Sandbox Secret Key**
+    - **Sandbox Public key of NAH**
+  - Prepare yor own Sandbox Private & Public Key. Step to generate your private key and public key is as following.
+
+  ```shellscript
+  # generate merchant's private key
+  openssl genrsa -out client.key 2048
+  # Generate Public Key
+  openssl rsa -in rsa_private_key.pem -out rsa_public_key.pem -pubout
+  ```
+
+  Please store your private key securely. The public key will need to be shared to NAH for security purposes.
+  - Prepare Sandbox Webhook URL
+  - To setup your sandbox settings, you can send an email to \<TBC Tech Onboarding Email\> with the following Subject: "Request for sandbox configuration". The request should include
+    - Sandbox Public Key to be shared to us in encrypted file to \<TBC Tech Onboarding Email\>. Password to be shared in different channel / same channel (i.e. Email, Whatsapp, Telegram) with different PIC
+    - Sandbox Webhook URL
+
+## Transaction Flow & Sequence Diagram
+
+- Crypto deposit flow
+
+  ![Image](/images/image-6.png)
+- Quote & Off-Ramp Flow
+
+  ![Image](/images/image-7.png)
+- Failure and retry points
+  - Rate Expired -\> We recommend you handle this by re-quote the transaction and execute it with the newest quote
+  - Handling of timeout for transaction notification.
+    - We currently provide webhook handling for Crypto Deposit transaction & Swap transaction with the following event: swap.executed , asset.deposited. If you have configured the webhook URL, when ack is not received by us, we will retry the webhook for 5 times with exponential interval.
+    - If there are any timeout for the transaction, we recommend you check the status of transaction using get API for the transaction.
+
+## Authentication and Security
+
+- API key
+- Access Token
+- Signature
+- IP whitelisting
+
+## Error Handling and Edge Cases
+
+- Common error categories
+- Business vs technical errors
+- Timeout and retry scenarios
+- Duplicate request handling
+
+## Off-Ramp Integration Steps
+
+- Step-by-step flow
+- Asset validation and balance checks
+- Withdrawal lifecycle
+- Status updates and completion
+
+## Webhooks and Events
+
+- List of webhook event types:
+
+| Event            | When it's fired                                                         | Case      | Handling |
+| ---------------- | ----------------------------------------------------------------------- | --------- | -------- |
+| asset.deposited. | When a crypto asset is credited to your crypto account in the CEX       | Completed |          |
+| swap.executed    | When a swap (Crypto - Fiat or Fiat - Crypto) is successfuly processed   | Completed |          |
+| swap.executed    | When a swap (Crypto - Fiat or Fiat - Crypto) is  processed with failure | Failed    |          |
+
+- Handling of timeout for webhook/transaction notification.
+  - We currently provide webhook handling for Crypto Deposit transaction & Swap transaction with the following event: swap.executed , asset.deposited. If you have configured the webhook URL, when ack is not received by us, we will retry the webhook for 5 times with exponential interval.
+  - If there are any timeout for the transaction, we recommend you check the status of transaction using get API for the transaction.
+
+## 

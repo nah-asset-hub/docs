@@ -14,8 +14,8 @@
         "tab": "Guides",
         "pages": [
           "index",
-          "development",
-          "quickstart",
+          "integration",
+          "testing",
           "guides/go-live-checklist"
         ]
       },
