@@ -24,6 +24,7 @@
           "api-reference/introduction",
           {
             "group": "API Reference",
+            "icon": "wrench",
             "openapi": "openapi.json"
           },
           "api-reference/api-reference/transaction-notification-webhook"

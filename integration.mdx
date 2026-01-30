@@ -1,6 +1,7 @@
 ---
 title: "Integration Guide"
 description: "This page will explain the integration steps/ information for you to implement our API efficiently"
+icon: "chart-network"
 ---
 
 ## Integration Overview
@@ -86,31 +87,37 @@ Here's the following failure & retry point you need to handle from your end
   - We currently provide webhook retry. If you have configured the webhook URL, when ack is not received by us, we will retry the webhook for 5 times with exponential interval.
   - If there are any timeout for the transaction / webhook notification, we recommend you check the status of transaction using get API to update your internal status.
 
-## Off-Ramp Integration Steps
+## API List
 
-### **1.  Supporting Information**
+| Category               | API Name                      | URL                               | Method | Description                                                                                  |
+| ---------------------- | ----------------------------- | --------------------------------- | ------ | -------------------------------------------------------------------------------------------- |
+| Supporting Information | Get Supported Digital Asset   | baseUrl/v1.0/assets               | GET    | Return information of digital asset supported & supporting information related to the asset  |
+| Supporting Information | Get Supported Swap Pairs      | baseUrl/v1.0/pairs                | GET    | Return information of swap pairs supported                                                   |
+| Authentication         | Generate Access Token         | {baseUrl}/v1.0/access-token       | POST   | Get access token as authentication to access transaction API                                 |
+| Accounts               | Get Accounts                  | baseUrl/v1.0/accounts             | GET    | Get list of account & balance of digital asset                                               |
+| Accounts               | Get Account by ID             | baseUrl/v1.0/accounts/:id         | GET    | Get single account & balance of digital asset                                                |
+| Accounts               | Get Account Ledger            | {baseUrl}/v1.0/accounts/ledgers   | GET    | Get account transaction history and balance of the account                                   |
+| Deposits               | Create Deposit Address        | {baseUrl}/v1.0/deposits/addresses | POST   | Returns a wallet address where merchants can deposit crypto asset for off-ramp transactions. |
+| Deposits               | Get Deposit Transactions      | {baseUrl}/v1.0/deposits           | GET    | Return list of deposit transactions ordered from latest to oldest based on createdAt field   |
+| Deposits               | Get Deposit Transaction by ID | {baseUrl}/v1.0/deposits/:id       | GET    | Return deposit transaction based on id                                                       |
+| Quotes                 | Create Quote                  | {baseUrl}/v1.0/quotes             | POST   | Get swap rate from one asset to another                                                      |
+| Quotes                 | Get Quotes                    | {baseUrl}/v1.0/quotes             | GET    | Return list of quotes                                                                        |
+| Quotes                 | Get Quote by ID               | {baseUrl}/v1.0/quotes/:id         | GET    | Return quote by its ID                                                                       |
+| Swap                   | Create Swap                   | {baseUrl}/v1.0/swaps              | POST   | Convert based from one asset to another based on quote ID                                    |
+| Swap                   | Get Swaps                     | {baseUrl}/v1.0/swaps              | GET    | Return list of swaps                                                                         |
+| Swap                   | Get Swap by ID                | {baseUrl}/v1.0/swaps/:id          | GET    | Return swap by its ID                                                                        |
 
-- Get Supported Digital Asset: Return information of digital asset supported & supporting information related to the asset
-- Get Supported Swap Pairs: Return information of swap pairs supported
+### Object information:
 
-### **2. Accounts**
+### **1. Accounts**
 
 Account represent a wallet/ balance for your digital asset. An Account will represent 1 digital asset per provider/CEX.
 
-- Get Accounts
-- Get Account by ID
-- Get Account Ledger
-
-### **3.  Deposits**
+### **2. Deposits**
 
 Deposit represent both the deposit address and the transaction. Deposit address will be generated for the digital asset, and once there's a transfer to the deposit address, deposit transaction will be created. Successful deposit will add the balance to your digital asset account
 
 **Deposit Transaction Status Lifecycle**
-
-| Status    | Definition                                                                                              |
-| --------- | ------------------------------------------------------------------------------------------------------- |
-| completed | Deposit transaction is success and balance will be credited according to the deposit transaction amount |
-| failed    | Deposit transaction is failed  and your balance will not be credited                                    |
 
 <img
   src="/images/image-12.png"
@@ -119,22 +126,16 @@ Deposit represent both the deposit address and the transaction. Deposit address 
   style={{ width:"25%" }}
 />
 
-- Create Deposit Address
-- Get Deposit Transactions
-- Get Deposit Transaction by ID
-- Deposit Transaction Webhook Handling
+| Status    | Definition                                                                                              |
+| :-------- | :------------------------------------------------------------------------------------------------------ |
+| completed | Deposit transaction is success and balance will be credited according to the deposit transaction amount |
+| failed    | Deposit transaction is failed  and your balance will not be credited                                    |
 
-### **4.  Quotes**
+### **3. Quotes**
 
 Quote represent inquiring rate from the provider/ CEX. This quote can then be used to execute the swap transaction (fiat - digital asset, digital asset - fiat , digital asset - digital asset)
 
 **Status Lifecycle**
-
-| Status  | Definition                                   |
-| :------ | :------------------------------------------- |
-| active  | Quote is ready to use for transaction        |
-| used    | Quote is already executed for swap           |
-| expired | Quote is expired and cannot be used for swap |
 
 <img
   src="/images/image-10.png"
@@ -143,21 +144,17 @@ Quote represent inquiring rate from the provider/ CEX. This quote can then be us
   style={{ width:"20%" }}
 />
 
-- Create Quote
-- Get Quotes
-- Get Quote by ID
+| Status  | Definition                                   |
+| :------ | :------------------------------------------- |
+| active  | Quote is ready to use for transaction        |
+| used    | Quote is already executed for swap           |
+| expired | Quote is expired and cannot be used for swap |
 
-### **5.  Swaps**
+### **4. Swaps**
 
 Swap represent execution of a conversion transaction from fiat - digital asset, digital asset - fiat , digital asset - digital asset. To execute swap , you need to first quote the rate first.
 
 **Status Lifecycle**
-
-| Status     | Definition                                         |
-| :--------- | :------------------------------------------------- |
-| processing | Swap initial phase after executed                  |
-| completed  | Swap is successfuly executed by the CEX / partner  |
-| failed     | Swap is failed to be executed by the CEX / partner |
 
 <img
   src="/images/image-11.png"
@@ -166,9 +163,34 @@ Swap represent execution of a conversion transaction from fiat - digital asset, 
   style={{ width:"20%" }}
 />
 
+| Status     | Definition                                         |
+| :--------- | :------------------------------------------------- |
+| processing | Swap initial phase after executed                  |
+| completed  | Swap is successfuly executed by the CEX / partner  |
+| failed     | Swap is failed to be executed by the CEX / partner |
+
+## Off-Ramp Integration Steps
+
+### **0.  Credentials Preparation**
+
+Please follow the guide for credentials preparation on the top of this page
+
+### **1.  Authorization & Signature Handling**
+
+- Generate Access Token
+
+### **2.  Crypto Deposits**
+
+- Create Deposit Address
+- Deposit Transaction Webhook Handling
+
+### **3. Quotes**
+
+- Create Quote
+
+### **4.  Swaps**
+
 - Create Swap
-- Get Swaps
-- Get Swap by ID
 - Swap Webhook handling
 
 ## Webhooks and Events
@@ -215,8 +237,8 @@ List of webhook event types supported in NAH side:
 
 ### Swap
 
-| **Case Handling**             | **Header Value**                        | **Output Sample** |
-| :---------------------------- | :-------------------------------------- | :---------------- |
-| Simulate success              | without header value of X-SANDBOX-ERROR | status code 202   |
-| Simulate Insufficient Balance | X-SANDBOX-ERROR = INSUFFICIENT_BALANCE  | status code 422   |
-| Simulate Token is Expired     | X-SANDBOX-ERROR = QUOTE_EXPIRED         | status code 404   |
+| **Case Handling**             | **Header Value**                        | **Output Sample**                                                                                                                                      |
+| :---------------------------- | :-------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Simulate Success              | without header value of X-SANDBOX-ERROR | status code 202<br /><br />In Swap transaction, it will be marked as success, swap executed webhook: completed will be sent to the sandbox webhook url |
+| Simulate Insufficient Balance | X-SANDBOX-ERROR = INSUFFICIENT_BALANCE  | status code 422<br /><br />In Swap transaction, it will be marked as failed, swap executed webhook: failed will be sent to the sandbox webhook url     |
+| Simulate Token is Expired     | X-SANDBOX-ERROR = QUOTE_EXPIRED         | status code 404<br /><br />In Swap transaction, it will be marked as failed, swap executed webhook: failed will be sent to the sandbox webhook url     |
