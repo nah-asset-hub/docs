@@ -9,9 +9,9 @@ description: "This page will explain the integration steps/ information for you 
 - We differentiate between sandbox & production API so you can safely test your implementation in sandbox mode. Sandbox environment will not initiate any real transaction and it's designed for testing purposes. Sandbox Base URL: https://api-sandbox.durian-x.com/v1.0
 - Credentials needed for integration:
   - Sandbox Account - you can request account creation via our BD team \<TBC Email\>. After account creation we will share to you
-    - **Sandbox X-CLIENT-ID**
-    - **Sandbox Secret Key**
-    - **Sandbox Public key of NAH**
+    - Sandbox X-CLIENT-ID
+    - Sandbox Secret Key
+    - Sandbox Public key of NAH
   - Prepare Sandbox Webhook URL
   - Prepare your own Sandbox Private & Public Key. Step to generate your private key and public key is as following.
 
@@ -36,11 +36,6 @@ description: "This page will explain the integration steps/ information for you 
 - **Quote & Off-Ramp Flow**
 
   ![Image](/images/image-7.png)
-- Failure and retry points
-  - Rate Expired -\> We recommend you handle this by re-quote the transaction and execute it with the newest quote
-  - Handling of timeout for transaction notification.
-    - We currently provide webhook handling for Crypto Deposit transaction & Swap transaction with the following event: swap.executed , asset.deposited. If you have configured the webhook URL, when ack is not received by us, we will retry the webhook for 5 times with exponential interval.
-    - If there are any timeout for the transaction, we recommend you check the status of transaction using get API for the transaction.
 
 ## Authentication and Security
 
@@ -49,7 +44,9 @@ description: "This page will explain the integration steps/ information for you 
 
 ## Error Handling and Edge Cases
 
-NAH will return common error as following when you are requesting API to our end.
+### Common Error
+
+For any success case, NAH will return 2XX HTTP Code as the response, however NAH will return these common error as following if there's an error happening for your request.
 
 | HTTP Error Code | Message                   | Handling                                                     |
 | --------------- | ------------------------- | ------------------------------------------------------------ |
@@ -58,6 +55,16 @@ NAH will return common error as following when you are requesting API to our end
 | 401             | StatusUnauthorized        | Re-check authorization handling from your end (Access Token) |
 
 In addition to this , there will be specific error for each of the API you will access.
+
+**Specific API Error**
+
+| API          | HTTP Error Code          | Code & Message             | Handling                                                                                   | Sample Error                                                                           |
+| ------------ | :----------------------- | :------------------------- | :----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Create Swap  | 404 Not Found            | INSUFFICIENT_FUNDS         | Check your current account balance & deposit fund                                          | { "code": INSUFFICIENT_FUNDS<br />"message: "insufficient balance on source asset" }   |
+| Create Swap  | 422 Unprocessable Entity | QUOTE_NOT_FOUND_OR_EXPIRED | Quote is expired/ Not found, please re-generate new quote                                  | {"code": "QUOTE_NOT_FOUND_OR_EXPIRED", "message": "quoteId is invalid or expired"      |
+| Create Quote | 400 Bad Request          | QUOTE_INVALID_AMOUNT       | Quote is not within the amount limit, Please re-generate new quote within the amount limit | { "code": "QUOTE_INVALID_AMOUNT", "message": "amount must be between 100 and 100000" } |
+
+### 
 
 ### Quote Expired
 
@@ -70,6 +77,17 @@ In case of a quote is expired, you cannot use it for the swap transaction. There
 ### Duplicate Request Handling
 
 - 
+
+**Failure and retry points**
+
+Here's the following failure & retry point you need to handle from your end
+
+- Rate Expired -\> We recommend you handle this by re-quote the transaction and execute it with the newest quote
+- Handling timeout when requesting a transaction
+  - We recommend you to get the status of the transaction.
+- Handling of timeout for transaction notification
+  - We currently provide webhook retry. If you have configured the webhook URL, when ack is not received by us, we will retry the webhook for 5 times with exponential interval.
+  - If there are any timeout for the transaction / webhook notification, we recommend you check the status of transaction using get API to update your internal status.
 
 ## Off-Ramp Integration Steps
 
@@ -169,3 +187,39 @@ Swap represent execution of a conversion transaction from fiat - digital asset, 
 - Handling of timeout for webhook/transaction notification.
   - We currently provide webhook handling for Crypto Deposit transaction & Swap transaction with the following event: swap.executed , asset.deposited. If you have configured the webhook URL, when ack is not received by us, we will retry the webhook for 5 times with exponential interval.
   - If there are any timeout for the transaction, we recommend you check the status of transaction using get API for the transaction.
+
+## How to test your implementation
+
+- We provide sandbox environment for you to test your implementation before going live. Currently the sandbox environment is supported only via API
+  - Sandbox Base URL: https://api-sandbox.durian-x.com/v1.0
+- To simulate certain error cases in each of the API you can use the following Header to simulate the transaction
+  - X-SANDBOX-ERROR
+  - X-SIMULATE-SANDBOX-TRX
+
+## Sandbox limitations
+
+- For Asset API we currently always set static balance information for the transaction
+
+## Simulating Edge Cases in Sandbox
+
+### Crypto Deposit
+
+| **Case Handling** | **Header Value**                                                              | **Output sample**                                                                                                                                    |
+| :---------------- | :---------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Simulate success  | Header<br />X-SANDBOX-DEPOSIT = 100.1<br />X-SIMULATE-SANDBOX-TRX = completed | status code 200 OK<br /><br />In Deposit transaction, it will be marked as completed, Crypto deposit webhook will be sent to sandbox webhook url set |
+| Simulate Failed   | Header<br />X-SANDBOX-DEPOSIT = 100.1<br />X-SIMULATE-SANDBOX-TRX = failed    | status code 200 OK<br /><br />In Deposit transaction, it will be marked as failed, Crypto deposit webhook will be sent to sandbox webhook url set    |
+
+### Quote
+
+| **Case Handling**    | **Header Value**                            | **Output sample** |
+| :------------------- | :------------------------------------------ | :---------------- |
+| Simulate success     | Any                                         | status code 201   |
+| Invalid Quote Amount | Header Any.<br />Body: Set sourceAmount = 1 | status code 400   |
+
+### Swap
+
+| **Case Handling**             | **Header Value**                        | **Output Sample** |
+| :---------------------------- | :-------------------------------------- | :---------------- |
+| Simulate success              | without header value of X-SANDBOX-ERROR | status code 202   |
+| Simulate Insufficient Balance | X-SANDBOX-ERROR = INSUFFICIENT_BALANCE  | status code 422   |
+| Simulate Token is Expired     | X-SANDBOX-ERROR = QUOTE_EXPIRED         | status code 404   |

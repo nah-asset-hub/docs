@@ -15,7 +15,6 @@
         "pages": [
           "index",
           "integration",
-          "testing",
           "guides/go-live-checklist"
         ]
       },

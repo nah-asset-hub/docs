@@ -11,24 +11,38 @@ We provide a conversion layer with help of the CEX and local PSP for fiat moveme
 
 Our solution supports:
 
-- Off-Ramp (USDT → IDR)
-- ~~On-Ramp (IDR → USDT)~~ (Coming Soon)
+- Digital asset management through local CEX
+- Quote rate to get the rate from the CEX
+- Digital Asset Deposit to topup your asset to the account managed in the CEX
+- Off-Ramp (USDT → IDR) - Convert Digital asset to fiat 
+- ~~On-Ramp (IDR → USDT) - Convert fiat  to digital asset~~ (Coming Soon) 
 - Local pay outs to suppliers, customers, and contractors in Indonesia via Durianpay
-- We currently support the following digital asset
-  - Supported Assets: USDT, USDC
-  - Supported Assets Network: ERC20, POLYGON, TRC20, BEP20
-  - Supported Fiat: IDR
-  - Destination Country: Indonesia
+
+### Supported Asset & Fiat 
+
+- Supported Assets: USDT, USDC
+- Supported Assets Network: ERC20, POLYGON, TRC20, BEP20
+- Supported Fiat: IDR
+
+The list of supported asset will be updated as we add more asset support into our system.
 
 ## How It Works
 
-NAH work with Durianpay to provide full capability of on/off ramp. NAH will be the one handling the digital asset/ crypto and Durianpay will be a payment service provider in which you need to connect to for fiat movement.
+NAH work with Durianpay to provide full capability of on/off ramp. NAH with the help of CEX will be the one handling the digital asset/ crypto and Durianpay will be a payment service provider in which you need to connect to for fiat movement.
 
 - **Key parties involved:**
   - Merchant
   - NAH: System provider for digital asset
   - Durianpay: PSP NAH works for to support fiat fund movement in Indonesia
   - CEX: Crypto Exchange you will be registered to
+
+### Onboarding
+
+- To use NAH service, Merchant need to be onboarded to both NAH & Durianpay.
+  - Merchant can use NAH services after TnC is accepted/confirmed or signed by the merchant.
+  - NAH will perform KYC/KYB against the merchant to use the service. 
+  - After the KYC/KYB from NAH is finished, NAH will be onboarding merchant to the CEX to use digital asset service. 
+  - Merchant can use NAH service once there are at least 1 CEX approve the merchant onboarding
 
 ### Transaction Flow
 
@@ -39,24 +53,14 @@ NAH work with Durianpay to provide full capability of on/off ramp. NAH will be t
   🟢 = fund flow
 - **Quote Rate**
 
-  <img
-    src="/images/image.png"
-    alt="Image"
-    title="Image"
-    style={{ width:"71%" }}
-  />
+  ![Image](/images/image-17.png)
 - **Off-ramp flow (USDT → IDR)**
 
   ![Image](/images/image-1.png)
 
   🟢 = fund flow
 
-### Onboarding
-
-- To use NAH service, Merchant need to be onboarded to both NAH & Durianpay.
-- Merchant can use NAH services after TnC is accepted/confirmed or signed by the merchant.
-- NAH will perform KYC/KYB against the merchant to use the service. After the KYC/KYB from NAH is finished, NAH will be onboarding merchant to the CEX to use digital asset service. Merchant can use NAH service once there are at least 1 CEX the merchant is onboarded into and approved.
-
 ## What's next?
 
-You can contact our business PIC \<TBC Email\> for further details of onboarding requirement. We highly recommend you to onboard with DPI & NAH. If you are exploring about the integration, you can request for sandbox access via our business PIC.
+- You can contact our business PIC \<TBC Email\> for further details of onboarding requirement. We highly recommend you to onboard with DPI & NAH in one go. 
+- If you are exploring about the integration, you can request for sandbox access via our business PIC. You don't need to be fully onboarded to request for sandbox access.
