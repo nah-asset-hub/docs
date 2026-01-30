@@ -1,11 +1,17 @@
 ---
 title: "Transaction Notification/ Webhook"
-description: "This page explain about list of transaction notification to be handled from your side"
+description: "This page will explain about transaction notification to be handled from your side"
 ---
 
 ## Webhook Overview
 
+A webhook is a way for our system to automatically send updates to your server when a status change happens. You give us a URL on your server, and whenever there’s an update, we send the details to that URL.
+
+For example, if you set up a URL to receive `asset.deposited` webhook, we’ll instantly notify your server with a `asset.deposited` event as soon as the fund is deposited to your asset account.
+
 We will be sending a webhook notification with method of `POST &`Content-Type: `application/json`. Any webhook sent from NAH will include signature for verification from your end. We highly encourage you to handle signature verification for security purposes.
+
+Here's current supported event from our end:
 
 | Event           | Related API        | When it's fired                                                                   |
 | :-------------- | ------------------ | :-------------------------------------------------------------------------------- |
@@ -64,7 +70,7 @@ We will be sending a webhook notification with method of `POST &`Content-Type: 
 | asset     | string   | asset of the deposit                                                    | USDT, USDC                             |
 | network   | string   | Chain/ network used for deposit                                         | ERC20, POLYGON, TRC20,<br />BEP20      |
 | address   | string   | Address of the crypto/digital asset                                     | "0xabcdef0123456789"                   |
-| memo      | string   | Regex for addressValidation to validate the format of the asset address | "T[1-9a-zA-Z]{33}"                     |
+| memo      | string   | Regex for addressValidation to validate the format of the asset address | "T[1-9a-zA-Z]33"                       |
 | amount    | string   | Amount of the deposit transaction                                       | "10000.112345"                         |
 | txnHash   | string   | Transaction hash related to the deposit transaction                     | "0x123456789abcdef"                    |
 | createdAt | string   | Created at of the deposit transaction                                   | "2030-12-31T23:59:59+07:00"            |
@@ -75,11 +81,11 @@ We will be sending a webhook notification with method of `POST &`Content-Type: 
 - **Method:** `POST`
 - **Content-Type**: `application/json`
 
-**Webhook Sample **
+**Webhook Sample**
 
 <CodeGroup>
 
-``` swap.executed: completed
+```swap.executed: completed
 {
   "id": "019c0cc9-5b5a-7509-912c-539969db916b",
   "quoteId": "019c0cc9-2ef5-7b75-a5a1-15a8bcdac6df",
@@ -96,7 +102,7 @@ We will be sending a webhook notification with method of `POST &`Content-Type: 
 ```
 
 
-``` swap.executed : failed
+```swap.executed : failed
 {
   "id": "019c0d87-f657-77eb-9326-e71a0cacb79a",
   "quoteId": "019c0cc9-2ef5-7b75-a5a1-15a8bcdac6df",
@@ -143,7 +149,7 @@ In case of transaction notification / webhook is not received on your end. Here'
 
 ## Signature Verification
 
-You can find the required structure of the string to be decrypt as below:
+You can find the required structure of the string to be decrypted as following:
 
 ```
 <HTTP METHOD> + ":" + <RELATIVE PATH URL> + ":" + LowerCase(HexEncode(SHA-256(Minify(<H
@@ -203,7 +209,7 @@ To validate the signature:
 
 - Sample Code - Go
 
-  ```
+  ```go
   package main
   
   import (

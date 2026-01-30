@@ -24,11 +24,9 @@
           "api-reference/introduction",
           {
             "group": "API Reference",
-            "openapi": "openapi.json",
-            "pages": [
-              "api-reference/api-reference/transaction-notification-webhook"
-            ]
-          }
+            "openapi": "openapi.json"
+          },
+          "api-reference/api-reference/transaction-notification-webhook"
         ]
       }
     ]
