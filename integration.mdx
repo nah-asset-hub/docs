@@ -30,55 +30,52 @@ description: "This page will explain the integration steps/ information for you 
 
 ## Transaction Flow & Sequence Diagram
 
-- **Crypto deposit flow**
+### **Crypto deposit flow**
 
-  ![Image](/images/image-6.png)
-- **Quote & Off-Ramp Flow**
+![Image](/images/image-6.png)
 
-  ![Image](/images/image-7.png)
+### **Quote & Off-Ramp Flow**
+
+![Image](/images/image-7.png)
 
 ## Authentication and Security
 
-- Access Token Handling
-- Signature Handling
+### Access Token Handling
+
+TBC
+
+### Signature Handling
+
+TBC
 
 ## Error Handling and Edge Cases
 
 ### Common Error
 
-For any success case, NAH will return 2XX HTTP Code as the response, however NAH will return these common error as following if there's an error happening for your request.
+For any success case, NAH will return 2XX HTTP Code as the response, however for several error cases, NAH will return these common error as following:
 
-| HTTP Error Code | Message                   | Handling                                                     |
-| --------------- | ------------------------- | ------------------------------------------------------------ |
-| 500             | StatusInternalServerError | Retry / Raise to NAH for the issue                           |
-| 400             | StatusBadRequest          | Re-check the structure of the request body                   |
-| 401             | StatusUnauthorized        | Re-check authorization handling from your end (Access Token) |
+| HTTP Error Code | Message               | Handling                                                     |
+| --------------- | --------------------- | ------------------------------------------------------------ |
+| 500             | Internal Server Error | Retry / Raise to NAH for the issue                           |
+| 400             | Bad Request           | Re-check the structure of the request body                   |
+| 401             | Unauthorized          | Re-check authorization handling from your end (Access Token) |
 
-In addition to this , there will be specific error for each of the API you will access.
+In addition to this , there will be specific error for each of the API you will access as mentioned below:
 
 **Specific API Error**
 
-| API          | HTTP Error Code          | Code & Message             | Handling                                                                                   | Sample Error                                                                           |
-| ------------ | :----------------------- | :------------------------- | :----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| Create Swap  | 404 Not Found            | INSUFFICIENT_FUNDS         | Check your current account balance & deposit fund                                          | \{ "code": INSUFFICIENT_FUNDS<br />"message: "insufficient balance on source asset" \}   |
-| Create Swap  | 422 Unprocessable Entity | QUOTE_NOT_FOUND_OR_EXPIRED | Quote is expired/ Not found, please re-generate new quote                                  | \{"code": "QUOTE_NOT_FOUND_OR_EXPIRED", "message": "quoteId is invalid or expired" \}     |
-| Create Quote | 400 Bad Request          | QUOTE_INVALID_AMOUNT       | Quote is not within the amount limit, Please re-generate new quote within the amount limit | \{ "code": "QUOTE_INVALID_AMOUNT", "message": "amount must be between 100 and 100000" \} |
-
-### 
+| API            | HTTP Error Code          | Code                       | Handling                                                                                   | Sample Error                                                                       |
+| -------------- | :----------------------- | :------------------------- | :----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Create Deposit | 400 Bad Request          | BAD_REQUEST                | Check your body request and input the supported asset                                      | "code": BAD_REQUEST<br />"message: "Invalid request Asset Network"                 |
+| Create Swap    | 404 Not Found            | INSUFFICIENT_FUNDS         | Check your current account balance & deposit fund                                          | "code": INSUFFICIENT_FUNDS<br />"message: "insufficient balance on source asset"   |
+| Create Swap    | 422 Unprocessable Entity | QUOTE_NOT_FOUND_OR_EXPIRED | Quote is expired/ Not found, please re-generate new quote                                  | "code": "QUOTE_NOT_FOUND_OR_EXPIRED", "message": "quoteId is invalid or expired"   |
+| Create Quote   | 400 Bad Request          | QUOTE_INVALID_AMOUNT       | Quote is not within the amount limit, Please re-generate new quote within the amount limit | "code": "QUOTE_INVALID_AMOUNT", "message": "amount must be between 100 and 100000" |
 
 ### Quote Expired
 
 In case of a quote is expired, you cannot use it for the swap transaction. Therefore you need to handle from your end to re-quote in case of expired quote
 
-### Timeout Handling
-
-- 
-
-### Duplicate Request Handling
-
-- 
-
-**Failure and retry points**
+### Failure and retry points
 
 Here's the following failure & retry point you need to handle from your end
 
@@ -93,8 +90,8 @@ Here's the following failure & retry point you need to handle from your end
 
 ### **1.  Supporting Information**
 
-- \*\*Get Supported Digital Asset: \*\*Return information of digital asset supported & supporting information related to the asset
-- \*\*Get Supported Swap Pairs: \*\*Return information of swap pairs supported
+- Get Supported Digital Asset: Return information of digital asset supported & supporting information related to the asset
+- Get Supported Swap Pairs: Return information of swap pairs supported
 
 ### **2. Accounts**
 
@@ -176,7 +173,7 @@ Swap represent execution of a conversion transaction from fiat - digital asset, 
 
 ## Webhooks and Events
 
-- List of webhook event types:
+List of webhook event types supported in NAH side:
 
 | Event           | When it's fired                                                         | Case      |
 | --------------- | ----------------------------------------------------------------------- | --------- |
