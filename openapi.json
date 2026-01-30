@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "NAH Crypto Exchange Aggregator Service API",
+    "title": "DurianX Crypto Exchange Aggregator Service API",
     "description": "API documentation for the CEX Aggregator Service",
     "version": "1.0.0",
     "contact": {
@@ -14,7 +14,7 @@
       "description": "Base API Server",
       "variables": {
         "baseUrl": {
-          "default": "https://api.example.com",
+          "default": "https://api-sandbox.durian-x.com",
           "description": "Base URL for the API"
         }
       }
