@@ -19,7 +19,7 @@ Follow steps below, to use mTLS authentication with Durianpay's API
 1. **Generate Private Key and Certificate Signing Request**
 
 ```shellscript
-openssl genrsa -out ca.key 2048
+openssl genrsa -out ca.key 4096
 openssl req -new -x509 -days 365 -key ca.key -out ca.crt -subj "/C=US/ST=CA/L=SF/O=RSA-2048 CA/OU=IT/CN=My Root RSA 4096 CA"
 
 openssl genrsa -out client.key 4096
@@ -334,4 +334,4 @@ For On-ramp and Off-ramp Transaction we will check only for following request he
     | 409           | CONFLICT           | Transaction already processed or Transaction Conflict | Cannot use same X-EXTERNAL-ID in same day                                                                                                                                             |
     | 500           | GENERAL_ERROR      | General Error                                         | General Error                                                                                                                                                                         |
     | 500           | INTERNAL_ERROR     | Internal Server Error                                 | Unknown Internal Server Failure, Please inquiry the status or retry the process again                                                                                                 |
-    | 504           | TIMEOUT            | Timeout                                               | Timeout from the issue                                                                                                                                                                |
+    | 504           | TIMEOUT            | Timeout                                               | Timeout from the issue096                                                                                                                                                             |
