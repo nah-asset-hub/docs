@@ -31,7 +31,7 @@ extendedKeyUsage=clientAuth
 subjectAltName=DNS:localhost
 EOF
 openssl req -new -key client.key -out client.csr -subj "/C=US/ST=CA/L=SF/O=MyOrg/OU=MyOU/CN=MyClient"
-openssl x509 -req -in client.csr -CA ssl/ca.crt -CAkey ca.key -CAcreateserial -out client.crt -days 365 -extfile client.ext
+openssl x509 -req -in client.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out client.crt -days 365 -extfile client.ext
 ```
 
 2. Send your public key via e-mail to [support@durian-x.com](mailto:support@durian-x.com)
