@@ -60,9 +60,9 @@ In addition to this , there will be specific error for each of the API you will 
 
 | API          | HTTP Error Code          | Code & Message             | Handling                                                                                   | Sample Error                                                                           |
 | ------------ | :----------------------- | :------------------------- | :----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| Create Swap  | 404 Not Found            | INSUFFICIENT_FUNDS         | Check your current account balance & deposit fund                                          | { "code": INSUFFICIENT_FUNDS<br />"message: "insufficient balance on source asset" }   |
-| Create Swap  | 422 Unprocessable Entity | QUOTE_NOT_FOUND_OR_EXPIRED | Quote is expired/ Not found, please re-generate new quote                                  | {"code": "QUOTE_NOT_FOUND_OR_EXPIRED", "message": "quoteId is invalid or expired"      |
-| Create Quote | 400 Bad Request          | QUOTE_INVALID_AMOUNT       | Quote is not within the amount limit, Please re-generate new quote within the amount limit | { "code": "QUOTE_INVALID_AMOUNT", "message": "amount must be between 100 and 100000" } |
+| Create Swap  | 404 Not Found            | INSUFFICIENT_FUNDS         | Check your current account balance & deposit fund                                          | \{ "code": INSUFFICIENT_FUNDS<br />"message: "insufficient balance on source asset" \}   |
+| Create Swap  | 422 Unprocessable Entity | QUOTE_NOT_FOUND_OR_EXPIRED | Quote is expired/ Not found, please re-generate new quote                                  | \{"code": "QUOTE_NOT_FOUND_OR_EXPIRED", "message": "quoteId is invalid or expired" \}     |
+| Create Quote | 400 Bad Request          | QUOTE_INVALID_AMOUNT       | Quote is not within the amount limit, Please re-generate new quote within the amount limit | \{ "code": "QUOTE_INVALID_AMOUNT", "message": "amount must be between 100 and 100000" \} |
 
 ### 
 
