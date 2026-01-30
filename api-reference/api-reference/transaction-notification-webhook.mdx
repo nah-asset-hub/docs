@@ -1,4 +1,267 @@
 ---
-title: 'Transaction Notification/ Webhook'
+title: "Transaction Notification/ Webhook"
+description: "This page explain about list of transaction notification to be handled from your side"
 ---
 
+## Webhook Overview
+
+We will be sending a webhook notification with method of `POST &`Content-Type: `application/json`. Any webhook sent from NAH will include signature for verification from your end. We highly encourage you to handle signature verification for security purposes.
+
+| Event           | Related API        | When it's fired                                                                   |
+| :-------------- | ------------------ | :-------------------------------------------------------------------------------- |
+| asset.deposited | Crypto Deposit API | When a crypto asset is credited to your crypto account in the CEX                 |
+| swap.executed   | Swap API           | When a swap (Crypto - Fiat or Fiat - Crypto) reach final status (success/failure) |
+
+## List of Webhook Event
+
+### Asset Deposited Event
+
+- **Event Name**: `asset.deposited`
+- **Method**: `POST`
+- **Content-Type**: `application/json`
+
+**Webhook Sample**
+
+<CodeGroup>
+
+```json asset.deposited : success
+{
+	"id": "uuidv7",
+	"address": "0xabcdef0123456789",
+	"amount" : "10000.112345",
+	"network": "TRC20",
+	"status": "completed",
+	"createdAt": "2030-12-31T23:59:59+07:00",
+	"finalStatusAt": "2030-12-31T23:59:59+07:00",
+	"status": "completed",
+	"txnHash": "0x12345678abcdef",
+	"signature": "abcedefghijklmn"
+}
+```
+
+
+```json asset.deposited : failed
+{
+	"id": "uuidv7",
+	"address": "0xabcdef0123456789",
+	"amount" : "10000.112345",
+	"network": "TRC20",
+	"createdAt": "2030-12-31T23:59:59+07:00",
+	"finalStatusAt": "2030-12-31T23:59:59+07:00",
+	"status": "failed",
+	"failureReason": "failure reason here"
+}
+```
+
+</CodeGroup>
+
+**Field Definition**
+
+| **Field** | **Type** | **Description**                                                         | **Example**                            |
+| :-------- | :------- | :---------------------------------------------------------------------- | :------------------------------------- |
+| id        | string   | Deposit ID                                                              | "20000000-0000-0000-0000-000000000001" |
+| accountId | string   | Account ID which the deposit will be credited to                        | "10000000-0000-0000-0000-000000000001" |
+| asset     | string   | asset of the deposit                                                    | USDT, USDC                             |
+| network   | string   | Chain/ network used for deposit                                         | ERC20, POLYGON, TRC20,<br />BEP20      |
+| address   | string   | Address of the crypto/digital asset                                     | "0xabcdef0123456789"                   |
+| memo      | string   | Regex for addressValidation to validate the format of the asset address | "T[1-9a-zA-Z]{33}"                     |
+| amount    | string   | Amount of the deposit transaction                                       | "10000.112345"                         |
+| txnHash   | string   | Transaction hash related to the deposit transaction                     | "0x123456789abcdef"                    |
+| createdAt | string   | Created at of the deposit transaction                                   | "2030-12-31T23:59:59+07:00"            |
+
+### Swap Executed Event
+
+- **Event Name:** `swap.executed`
+- **Method:** `POST`
+- **Content-Type**: `application/json`
+
+**Webhook Sample **
+
+<CodeGroup>
+
+``` swap.executed: completed
+{
+  "id": "019c0cc9-5b5a-7509-912c-539969db916b",
+  "quoteId": "019c0cc9-2ef5-7b75-a5a1-15a8bcdac6df",
+  "referenceId": "test-126",
+  "sourceAsset": "USDT",
+  "sourceAmount": "1031.37",
+  "destinationAsset": "IDR",
+  "destinationAmount": "17000000",
+  "rate": "16483",
+  "status": "completed",
+  "createdAt": "2026-01-30T02:44:08Z",
+  "finalStatusAt": "2026-01-30T02:44:10Z"
+}
+```
+
+
+``` swap.executed : failed
+{
+  "id": "019c0d87-f657-77eb-9326-e71a0cacb79a",
+  "quoteId": "019c0cc9-2ef5-7b75-a5a1-15a8bcdac6df",
+  "referenceId": "test-126",
+  "sourceAsset": "USDT",
+  "sourceAmount": "1031.37",
+  "destinationAsset": "IDR",
+  "destinationAmount": "17000000",
+  "rate": "16483",
+  "status": "failed",
+  "createdAt": "2026-01-30T06:12:20Z",
+  "finalStatusAt": "2026-01-30T06:12:20Z",
+  "reason": "insufficient balance"
+}
+```
+
+</CodeGroup>
+
+**Field Definition**
+
+| **Field**         | **Type** | **Description**                                                                                                                                                           | **Example**                            |
+| :---------------- | :------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :------------------------------------- |
+| id                | string   | Swap ID. Durianpay’s side swap ID                                                                                                                                         | "20000000-0000-0000-0000-000000000001" |
+| quoteId           | string   | Quote ID used in the swap transaction                                                                                                                                     | "40000000-0000-0000-0000-000000000001" |
+| referenceId       | string   | Merchant’s owned transaction reference“                                                                                                                                   | swap1”                                 |
+| sourceAsset       | string   | Source asset to swap                                                                                                                                                      | “IDR”, “USDT”                          |
+| sourceAmount      | string   | Source amount to be swapped                                                                                                                                               | “100000000.00”                         |
+| destinationAsset  | string   | Destination asset to swap                                                                                                                                                 | “USDT”, “IDR”                          |
+| destinationAmount | string   | Destination amount to be swapped                                                                                                                                          | "600.00"                               |
+| rate              | string   | Exchange rate specified for the quote                                                                                                                                     | "16617.00"                             |
+| status            | string   | Status of the the swap . Value: <br />- completed: The swap is completed successfuly<br />- processing: The swap is in processing state<br />- failed: The swap is failed | “processing”                           |
+| createdAt         | string   | Timestamp of swap transaction created                                                                                                                                     | "2030-12-31T23:59:59+07:00"            |
+| finalStatusAt     | string   | Timestamp of when swap transaction is completed/failed                                                                                                                    | "2030-12-31T23:59:59+07:00"            |
+| reason            | string   | Reason if the transaction is failed                                                                                                                                       | “failed due to network issue”          |
+
+## Webhook Edge Cases Handling
+
+In case of transaction notification / webhook is not received on your end. Here's the following recommended step to handle from your end:
+
+- Waiting for our webhook retry\
+  We provide webhook retry up to 5 times with exponential interval. If you have configured the webhook URL, when your ack is not received by us, retry will be retriggered automatically from our end.
+- Get transaction status for important/ time sensitive transaction\
+  If there are any webhook timeout for the transaction, we recommend you check the status of transaction regularly using the transaction get API.
+
+## Signature Verification
+
+You can find the required structure of the string to be decrypt as below:
+
+```
+<HTTP METHOD> + ":" + <RELATIVE PATH URL> + ":" + LowerCase(HexEncode(SHA-256(Minify(<H
+TTP BODY>)))) + ":" + <X-TIMESTAMP>
+  // Example: POST:/v1.0/balance-inquiry::f806c49e8cd175aa9dd5dd8e0a49648c885954d:2024-05-13T15:07:07+07:00
+```
+
+For example:
+
+Given your webhook URL is https://merchant.com/webhook/asset-deposit and the header and payload as follows
+
+Header
+
+```
+X-Timestamp: 2025-12-15T10:49:49.971172Z
+```
+
+```
+
+{
+	"id":"019b0b0b-76a0-744d-ba52-682ccde1f211",
+	"merchantId":"mer_123",
+	"accountId":"1512630d-f6c1-489b-a957-da5b93df9807",
+	"address":"0x06978f1b3b281827d7d65501f94c0b9affd7bb43",
+	"amount":"10.1",
+	"network":"ERC20",
+	"status":"completed",
+	"asset":"USDT",
+	"txnHash":"0xb4f063ded48ddc4d8236d45b33bd6e4ce18afebc113fc4fd0a5fd439b862cc5b",
+	"createdAt":"2025-12-15T10:49:49.971172Z",
+	"finalStatusAt":"2025-12-15T10:49:49.971172Z",
+	"reason":"successful"
+}
+```
+
+Then the string to sign would be:
+
+```
+POST:/webhook/asset-deposit:f9a8c7e6d5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8:2025-12-15T10:49:49.971+00:00
+```
+
+Where:
+
+- `POST` is the HTTP method
+- `/webhook/asset-deposit` is the relative path (without the domain)
+- `f9a8c7e6d5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8` is the lowercase hex-encoded SHA-256 hash of the minified JSON payload
+- `2024-05-13T15:07:07+07:00` is the X-Timestamp value from the webhook request header
+
+To validate the signature:
+
+1. Compute SHA-256 hash of the minified request body
+2. Convert the hash to lowercase hexadecimal string
+3. Construct the string: `HTTP_METHOD:RELATIVE_PATH:HASH:X_TIMESTAMP`
+4. Compute HMAC-SHA512 of this string using your Secret Key
+5. Base64 encode the result
+6. Compare with the X-Signature header value from the webhook request
+
+- Sample Code - Go
+
+  ```
+  package main
+  
+  import (
+  	"crypto/hmac"
+  	"crypto/sha256"
+  	"crypto/sha512"
+  	"encoding/base64"
+  	"encoding/hex"
+  	"encoding/json"
+  	"fmt"
+  	"log"
+  )
+  
+  func main() {
+  	// Webhook details
+  	httpMethod := "POST"
+  	relativePath := "/webhook/asset-deposit"
+  	timestamp := "2025-12-15T10:49:49.971+00:00"
+  	secretKey := "your-secret-key" // Replace with your actual secret key
+  	
+  	// Sample payload
+  	payload := map[string]interface{}{
+  		"id":            "019b0b0b-76a0-744d-ba52-682ccde1f211",
+  		"merchantId":    "mer_123",
+  		"accountId":     "1512630d-f6c1-489b-a957-da5b93df9807",
+  		"address":       "0x06978f1b3b281827d7d65501f94c0b9affd7bb43",
+  		"amount":        "10.1",
+  		"network":       "ERC20",
+  		"status":        "completed",
+  		"asset":         "USDT",
+  		"txnHash":       "0xb4f063ded48ddc4d8236d45b33bd6e4ce18afebc113fc4fd0a5fd439b862cc5b",
+  		"createdAt":     "2025-12-15 10:49:49.971172 +0000 UTC",
+  		"finalStatusAt": "2025-12-15 10:49:49.971172 +0000 UTC",
+  		"reason":        "successful",
+  	}
+  	
+  	// Minify JSON
+  	minified, err := json.Marshal(payload)
+  	if err != nil {
+  		log.Fatalf("Failed to marshal payload: %v", err)
+  	}
+  	
+  	// Compute SHA-256 hash
+  	hash := sha256.Sum256(minified)
+  	hashHex := hex.EncodeToString(hash[:])
+  	
+  	// Construct string to sign
+  	stringToSign := fmt.Sprintf("%s:%s:%s:%s", httpMethod, relativePath, hashHex, timestamp)
+  	fmt.Println("String to sign:", stringToSign)
+  	
+  	// Generate HMAC-SHA512 signature
+  	mac := hmac.New(sha512.New, []byte(secretKey))
+  	mac.Write([]byte(stringToSign))
+  	signature := mac.Sum(nil)
+  	
+  	// Base64 encode
+  	signatureBase64 := base64.StdEncoding.EncodeToString(signature)
+  	fmt.Println("X-Signature:", signatureBase64)
+  }
+  
+  ```
