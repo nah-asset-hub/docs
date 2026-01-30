@@ -12,7 +12,8 @@ description: "This page will explain the integration steps/ information for you 
     - **Sandbox X-CLIENT-ID**
     - **Sandbox Secret Key**
     - **Sandbox Public key of NAH**
-  - Prepare yor own Sandbox Private & Public Key. Step to generate your private key and public key is as following.
+  - Prepare Sandbox Webhook URL
+  - Prepare your own Sandbox Private & Public Key. Step to generate your private key and public key is as following.
 
   ```shellscript
   # generate merchant's private key
@@ -21,18 +22,18 @@ description: "This page will explain the integration steps/ information for you 
   openssl rsa -in rsa_private_key.pem -out rsa_public_key.pem -pubout
   ```
 
-  Please store your private key securely. The public key will need to be shared to NAH for security purposes.
-  - Prepare Sandbox Webhook URL
-  - To setup your sandbox settings, you can send an email to \<TBC Tech Onboarding Email\> with the following Subject: "Request for sandbox configuration". The request should include
+  _Please store your private key securely. The public key will need to be shared to NAH._
+  - Request for sandbox setup to NAH. \
+    To setup your sandbox settings, you can send an email to \<TBC Tech Onboarding Email\> with the following Subject: "Request for sandbox configuration". The request should include
     - Sandbox Public Key to be shared to us in encrypted file to \<TBC Tech Onboarding Email\>. Password to be shared in different channel / same channel (i.e. Email, Whatsapp, Telegram) with different PIC
     - Sandbox Webhook URL
 
 ## Transaction Flow & Sequence Diagram
 
-- Crypto deposit flow
+- **Crypto deposit flow**
 
   ![Image](/images/image-6.png)
-- Quote & Off-Ramp Flow
+- **Quote & Off-Ramp Flow**
 
   ![Image](/images/image-7.png)
 - Failure and retry points
@@ -48,17 +49,34 @@ description: "This page will explain the integration steps/ information for you 
 
 ## Error Handling and Edge Cases
 
-- Common error categories
-- Business vs technical errors
-- Timeout and retry scenarios
-- Duplicate request handling
+NAH will return common error as following when you are requesting API to our end.
+
+| HTTP Error Code | Message                   | Handling                                                     |
+| --------------- | ------------------------- | ------------------------------------------------------------ |
+| 500             | StatusInternalServerError | Retry / Raise to NAH for the issue                           |
+| 400             | StatusBadRequest          | Re-check the structure of the request body                   |
+| 401             | StatusUnauthorized        | Re-check authorization handling from your end (Access Token) |
+
+In addition to this , there will be specific error for each of the API you will access.
+
+### Quote Expired
+
+In case of a quote is expired, you cannot use it for the swap transaction. Therefore you need to handle from your end to re-quote in case of expired quote
+
+### Timeout Handling
+
+- 
+
+### Duplicate Request Handling
+
+- 
 
 ## Off-Ramp Integration Steps
 
 ### **1.  Supporting Information**
 
-- **Get Supported Digital Asset: **Return information of digital asset supported & supporting information related to the asset
-- **Get Supported Swap Pairs: **Return information of swap pairs supported
+- \*\*Get Supported Digital Asset: \*\*Return information of digital asset supported & supporting information related to the asset
+- \*\*Get Supported Swap Pairs: \*\*Return information of swap pairs supported
 
 ### **2. Accounts**
 
