@@ -19,16 +19,19 @@ Follow steps below, to use mTLS authentication with Durianpay's API
 1. **Generate Private Key and Certificate Signing Request**
 
 ```shellscript
-openssl genrsa -out ssl/client.key 4096
-cat > ssl/client.ext <<EOF
+openssl genrsa -out ca.key 2048
+openssl req -new -x509 -days 365 -key ca.key -out ca.crt -subj "/C=US/ST=CA/L=SF/O=RSA-2048 CA/OU=IT/CN=My Root RSA 4096 CA"
+
+openssl genrsa -out client.key 4096
+cat > client.ext <<EOF
 authorityKeyIdentifier=keyid,issuer
 basicConstraints=CA:FALSE
 keyUsage=digitalSignature, keyEncipherment
 extendedKeyUsage=clientAuth
 subjectAltName=DNS:localhost
 EOF
-openssl req -new -key ssl/client.key -out ssl/client.csr -subj "/C=US/ST=CA/L=SF/O=MyOrg/OU=MyOU/CN=MyClient"
-openssl x509 -req -in ssl/client.csr -CA ssl/ca.crt -CAkey ssl/ca.key -CAcreateserial -out ssl/client.crt -days 365 -extfile ssl/client.ext
+openssl req -new -key client.key -out client.csr -subj "/C=US/ST=CA/L=SF/O=MyOrg/OU=MyOU/CN=MyClient"
+openssl x509 -req -in client.csr -CA ssl/ca.crt -CAkey ca.key -CAcreateserial -out client.crt -days 365 -extfile client.ext
 ```
 
 2. Send your public key via e-mail to [support@durian-x.com](mailto:support@durian-x.com)
