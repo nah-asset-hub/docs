@@ -1,21 +1,18 @@
 ---
-title: "API Introduction"
-description: "This is a merchant-facing API that supports stablecoin on-ramp and off-ramp transactions. We provide REST API with OAuth 2.0 for authorization."
+title: "Authentication"
 icon: "computer"
+description: ""
 ---
 
-## General Information
-
-Below are the details for the Sandbox and Live URLs for onramp and off-ramp Transaction in Durianpay:
-
-- Production Base URL: https://api.durian-x.com/v1.0
-- Sandbox Base URL: https://api-sandbox.durian-x.com/v1.0
-
 ## Authentication
+When you're calling any of DurianX API, you have to provide several parameter in the header. We will provide following details for you to authenticate your Request:
+- Client ID
+- Client Secret
+- Your Public Key
+- Durianpay's Public Key
 
 ### Credential Setup
 
-Follow steps below, to use mTLS authentication with Durianpay's API
 
 1. **Generate Private Key and Certificate Signing Request**
 

@@ -21,6 +21,7 @@
       {
         "tab": "API reference",
         "pages": [
+          "api-reference/introduction-1",
           "api-reference/introduction",
           {
             "group": "API Reference",
