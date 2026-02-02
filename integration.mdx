@@ -13,11 +13,11 @@ icon: "chart-network"
     - Sandbox Secret Key
     - Sandbox Public key of NAH
   - Prepare Sandbox Webhook URL
-  - Prepare your own Sandbox Private & Public Key. To generate your private key and public key, please follow this [link](/api-reference/introduction-1)
+  - Prepare your own Sandbox Private & Public Key. To generate your private key and public key, please follow this [link](/api-reference/authentication#credential-setup)
 
   _Please store your private key securely. The public key will need to be shared to NAH._
   - Request for sandbox setup to NAH. \
-    To setup your sandbox settings, you can send an email to \<TBC Tech Onboarding Email\> with the following Subject: "Request for sandbox configuration". The request should include
+    To setup your sandbox settings, you can send an email to [support@durian-x.com](mailto:support@durian-x.com) with the following Subject: "Request for sandbox configuration". The request should include
     - Sandbox Public Key to be shared to us in encrypted file to \<TBC Tech Onboarding Email\>. Password to be shared in different channel / same channel (i.e. Email, Whatsapp, Telegram) with different PIC
     - Sandbox Webhook URL
 
@@ -35,34 +35,16 @@ icon: "chart-network"
 
 ### Access Token Handling
 
-[Resources for Access Token Handling](/api-reference/introduction#credential-setup)
+[Link for Access Token Handling](/api-reference/authentication#generate-signature-to-obtain-access-token-b2b)
 
 ### Signature Handling
 
-TBC
+[Link for Access Token Handling](/api-reference/authentication#generate-signature-for-transactional-api)
 
 ## Error Handling and Edge Cases
 
-### Common Error
-
-For any success case, NAH will return 2XX HTTP Code as the response, however for several error cases, NAH will return these common error as following:
-
-| HTTP Error Code | Message               | Handling                                                     |
-| --------------- | --------------------- | ------------------------------------------------------------ |
-| 500             | Internal Server Error | Retry / Raise to NAH for the issue                           |
-| 400             | Bad Request           | Re-check the structure of the request body                   |
-| 401             | Unauthorized          | Re-check authorization handling from your end (Access Token) |
-
-In addition to this , there will be specific error for each of the API you will access as mentioned below:
-
-**Specific API Error**
-
-| API            | HTTP Error Code          | Code                       | Handling                                                                                   | Sample Error                                                                       |
-| -------------- | :----------------------- | :------------------------- | :----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| Create Deposit | 400 Bad Request          | BAD_REQUEST                | Check your body request and input the supported asset                                      | "code": BAD_REQUEST<br />"message: "Invalid request Asset Network"                 |
-| Create Swap    | 404 Not Found            | INSUFFICIENT_FUNDS         | Check your current account balance & deposit fund                                          | "code": INSUFFICIENT_FUNDS<br />"message: "insufficient balance on source asset"   |
-| Create Swap    | 422 Unprocessable Entity | QUOTE_NOT_FOUND_OR_EXPIRED | Quote is expired/ Not found, please re-generate new quote                                  | "code": "QUOTE_NOT_FOUND_OR_EXPIRED", "message": "quoteId is invalid or expired"   |
-| Create Quote   | 400 Bad Request          | QUOTE_INVALID_AMOUNT       | Quote is not within the amount limit, Please re-generate new quote within the amount limit | "code": "QUOTE_INVALID_AMOUNT", "message": "amount must be between 100 and 100000" |
+### Response Code List
+[Link for Access Token Handling](/api-reference/authentication)
 
 ### Quote Expired
 

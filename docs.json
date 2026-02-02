@@ -21,8 +21,8 @@
       {
         "tab": "API reference",
         "pages": [
-          "api-reference/introduction-1",
           "api-reference/introduction",
+          "api-reference/authentication",
           {
             "group": "API Reference",
             "icon": "wrench",
