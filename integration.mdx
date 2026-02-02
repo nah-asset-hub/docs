@@ -73,7 +73,9 @@ curl --location 'https://api-sandbox.durian-x.com/v1.0/access-token' \
 
 **3.1 Create Deposit Address**
 
-If you are testing in sandbox mode, please make sure to include header of X-SANDBOX-DEPOSIT (number value) & X-SANDBOX-SIMULATE-TRX (completed/failed value) to create the success/ failed deposit transaction. This X-Header is not needed in production mode. X-SANDBOX-SIMULATE-TRX will also simulate
+If you are testing in sandbox mode, please make sure to include header of X-SANDBOX-DEPOSIT (number value) & X-SANDBOX-SIMULATE-TRX (completed/failed value) to create the success/ failed deposit transaction. This X-Header is not needed in production mode. X-SANDBOX-SIMULATE-TRX will also simulate webhook generation.
+[Link for Deposit Transaction Sandbox Simulator](#crypto-deposit)
+
 
 - **Request Sample:**
 
@@ -157,6 +159,7 @@ Once a deposit address is created, in sandbox mode, X-SANDBOX-SIMULATE-TRX & X-S
 ### **4. Quotes**
 
 To execute swap (on/off-ramp) you will be required to quote rate to get current rate and lock the rate. Any quotes originally created will be in active status with transition to expired or used. Quote will have expiry time to be executed marked in expiredAt.
+[Link for Quotes Sandbox Simulator](#quote)
 
 **Request Sample:**
 
@@ -199,6 +202,7 @@ curl --location 'https://api-sandbox.durian-x.com/v1.0/quotes' \
 **Create Swap**
 
 Use your active quote to execute a swap for the transaction. referenceId can be used to refer the swap transaction from your end. The created swap will have status of processing which will move to completed/failed
+[Link for Swap Sandbox Simulator](#swap)
 
 - **Request Sample**
 
