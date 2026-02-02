@@ -1,11 +1,11 @@
 ---
 icon: "key-skeleton-left-right"
-title: "Authentication"
+title: "Authentication & Response Code"
 ---
 
 ## Overview
 
-When you're calling any of DurianX API, you have to provide several parameter in the header. We will provide following details for you to authenticate your Request:
+When you're calling any of DurianX API, you have to provide several parameter in the header. We will provide following details for you to authenticate your request:
 
 - Client ID
 - Client Secret
@@ -195,6 +195,8 @@ X-Signature: tnNHFw5ZCWjnHFd9UGAB5iDLuwo+89efml8F1CP8vaqut/PfNWac/XLiCkLt3zGHTpp
 ```
 curl --location 'https://api-sandbox.durian-x.com/v1.0/access-token' \
 --header 'Content-Type: application/json' \
+--header 'X-TIMESTAMP: 2024-05-13T15:32:36.422+07:00' \
+--header 'X-SIGNATURE: KLJ9KthaIiZSzPqHUMuJRsKOZtYCqqWd5DhfWqYC7OjZ2Qlu0PvQ2wRQF5vfDWsz/qFYEexOXb47+oQBjMhAz4XRNhXBBfwoWxrGTG8iU8EYSDVfChW0NqAWjWIQolhB4UcHn5SybPFRON3rvAOIQTzuEshUA1PNAln8jOKaRmY=' \
 --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJjZXhfYWdncmVnYXRvcl9zZXJ2aWNlIiwiZXhwIjoxNzcwMDQzNzUwLCJpYXQiOjE3NzAwNDI4NTAsIm1lcmNoYW50X2lkIjoibWVyX2huNXY4MG1Dd0Q2MjI0IiwiZ3JhbnRfdHlwZSI6ImNsaWVudF9jcmVkZW50aWFscyIsImNsaWVudF9pZCI6ImNsaWVudF8zMjYyc053bVVQRnRwN3NndkU2Y20ifQ.SiIf7u96ANBU4RIbNLtJNfwgGs_S6p16bXK3HilvUhQ' \
 --data '{
     "grantType": "client_credentials"

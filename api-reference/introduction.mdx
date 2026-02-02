@@ -19,3 +19,96 @@ Below are the details for the Sandbox and Live URLs for onramp and off-ramp Tran
 
 - Production Base URL: https://api.durian-x.com/v1.0
 - Sandbox Base URL: https://api-sandbox.durian-x.com/v1.0
+
+## Transaction Flow & Sequence Diagram
+
+### **Crypto deposit flow**
+
+![Image](/images/image-6.png)
+
+### **Quote & Off-Ramp Flow**
+
+![Image](/images/image-7.png)
+
+## Object information:
+
+### **1. Accounts**
+
+Account represent a wallet/ balance for your digital asset. An Account will represent 1 digital asset per provider/CEX.
+
+### **2. Deposits**
+
+Deposit represent both the deposit address and the transaction. Deposit address will be generated for the digital asset, and once there's a transfer to the deposit address, deposit transaction will be created. Successful deposit will add the balance to your digital asset account
+
+**Deposit Transaction Status Lifecycle**
+
+<img
+  src="/images/image-12.png"
+  alt="Image"
+  title="Image"
+  style={{ width:"25%" }}
+/>
+
+| Status    | Definition                                                                                              |
+| :-------- | :------------------------------------------------------------------------------------------------------ |
+| completed | Deposit transaction is success and balance will be credited according to the deposit transaction amount |
+| failed    | Deposit transaction is failed  and your balance will not be credited                                    |
+
+### **3. Quotes**
+
+Quote represent inquiring rate from the provider/ CEX. This quote can then be used to execute the swap transaction (fiat - digital asset, digital asset - fiat , digital asset - digital asset)
+
+**Status Lifecycle**
+
+<img
+  src="/images/image-10.png"
+  alt="Image"
+  title="Image"
+  style={{ width:"20%" }}
+/>
+
+| Status  | Definition                                   |
+| :------ | :------------------------------------------- |
+| active  | Quote is ready to use for transaction        |
+| used    | Quote is already executed for swap           |
+| expired | Quote is expired and cannot be used for swap |
+
+### **4. Swaps**
+
+Swap represent execution of a conversion transaction from fiat - digital asset, digital asset - fiat , digital asset - digital asset. To execute swap , you need to first quote the rate first.
+
+**Status Lifecycle**
+
+<img
+  src="/images/image-11.png"
+  alt="Image"
+  title="Image"
+  style={{ width:"20%" }}
+/>
+
+| Status     | Definition                                         |
+| :--------- | :------------------------------------------------- |
+| processing | Swap initial phase after executed                  |
+| completed  | Swap is successfuly executed by the CEX / partner  |
+| failed     | Swap is failed to be executed by the CEX / partner |
+
+
+## API List
+
+| Category               | API Name                      | URL                             | Method | Description                                                                                  |
+| :--------------------- | :---------------------------- | :------------------------------ | :----- | :------------------------------------------------------------------------------------------- |
+| Supporting Information | Get Supported Digital Asset   | baseUrl/v1.0/assets             | GET    | Return information of digital asset supported & supporting information related to the asset  |
+| Supporting Information | Get Supported Swap Pairs      | baseUrl/v1.0/pairs              | GET    | Return information of swap pairs supported                                                   |
+| Authentication         | Generate Access Token         | baseUrl/v1.0/access-token       | POST   | Get access token as authentication to access transaction API                                 |
+| Accounts               | Get Accounts                  | baseUrl/v1.0/accounts           | GET    | Get list of account & balance of digital asset                                               |
+| Accounts               | Get Account by ID             | baseUrl/v1.0/accounts/:id       | GET    | Get single account & balance of digital asset                                                |
+| Accounts               | Get Account Ledger            | baseUrl/v1.0/accounts/ledgers   | GET    | Get account transaction history and balance of the account                                   |
+| Deposits               | Create Deposit Address        | baseUrl/v1.0/deposits/addresses | POST   | Returns a wallet address where merchants can deposit crypto asset for off-ramp transactions. |
+| Deposits               | Get Deposit Transactions      | baseUrl/v1.0/deposits           | GET    | Return list of deposit transactions ordered from latest to oldest based on createdAt field   |
+| Deposits               | Get Deposit Transaction by ID | baseUrl/v1.0/deposits/:id       | GET    | Return deposit transaction based on id                                                       |
+| Quotes                 | Create Quote                  | baseUrl/v1.0/quotes             | POST   | Get swap rate from one asset to another                                                      |
+| Quotes                 | Get Quotes                    | baseUrl/v1.0/quotes             | GET    | Return list of quotes                                                                        |
+| Quotes                 | Get Quote by ID               | baseUrl/v1.0/quotes/:id         | GET    | Return quote by its ID                                                                       |
+| Swap                   | Create Swap                   | baseUrl/v1.0/swaps              | POST   | Convert based from one asset to another based on quote ID                                    |
+| Swap                   | Get Swaps                     | baseUrl/v1.0/swaps              | GET    | Return list of swaps                                                                         |
+| Swap                   | Get Swap by ID                | baseUrl/v1.0/swaps/:id          | GET    | Return swap by its ID                                                                        |

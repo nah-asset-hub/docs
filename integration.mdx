@@ -3,17 +3,18 @@ title: "Integration Guide"
 icon: "chart-network"
 ---
 
-## Integration Preparation
+## Credentials Preparation
 
-- We  currently provide REST API with OAuth 2.0 for authorization.
-- We differentiate between sandbox & production API so you can safely test your implementation in sandbox mode. Sandbox environment will not initiate any real transaction and it's designed for testing purposes. Sandbox Base URL: https://api-sandbox.durian-x.com/v1.0
+- NAH  provide REST API with OAuth 2.0 for authorization.
+- NAH differentiate between sandbox & production API so you can safely test your implementation in sandbox mode. Sandbox environment will not initiate any real transaction and it's designed for testing purposes.
+- Sandbox Base URL: https://api-sandbox.durian-x.com/v1.0
 - Credentials needed for integration:
-  - Sandbox Account - you can request account creation via our BD team \<TBC Email\>. After account creation we will share to you
+  - Sandbox Account - you can request account creation via our BD team [sales@durian-x.com](mailto:sales@durian-x.com). After account creation we will share to you
     - Sandbox X-CLIENT-ID
     - Sandbox Secret Key
     - Sandbox Public key of NAH
   - Prepare Sandbox Webhook URL
-  - Prepare your own Sandbox Private & Public Key. To generate your private key and public key, please follow this [link](/api-reference/authentication#credential-setup)
+  - Prepare your own Sandbox Private & Public Key. To generate your private key and public key, please follow this [link](/api-reference/authentication#credential-setup). We highly recommend to differentiate sandbox and production key.
 
   _Please store your private key securely. The public key will need to be shared to NAH._
   - Request for sandbox setup to NAH. \
@@ -21,30 +22,221 @@ icon: "chart-network"
     - Sandbox Public Key to be shared to us in encrypted file to \<TBC Tech Onboarding Email\>. Password to be shared in different channel / same channel (i.e. Email, Whatsapp, Telegram) with different PIC
     - Sandbox Webhook URL
 
-## Transaction Flow & Sequence Diagram
+## Webhooks and Events
 
-### **Crypto deposit flow**
+List of webhook event types supported in NAH side:
 
-![Image](/images/image-6.png)
+| Event           | When it's fired                                                         | Case      |
+| :-------------- | :---------------------------------------------------------------------- | :-------- |
+| asset.deposited | When a crypto asset is credited to your crypto account in the CEX       | Completed |
+| swap.executed   | When a swap (Crypto - Fiat or Fiat - Crypto) is successfuly processed   | Completed |
+| swap.executed   | When a swap (Crypto - Fiat or Fiat - Crypto) is  processed with failure | Failed    |
 
-### **Quote & Off-Ramp Flow**
+[Link for Webhook Handling](/api-reference/api-reference/transaction-notification-webhook)
 
-![Image](/images/image-7.png)
+## Off-Ramp Integration Steps
 
-## Authentication and Security
+### 1. Generate Access Token
 
-### Access Token Handling
+1. Generate Access Token Signature as header information in access token API (X-Signature). [Link for Access Token X-Signature Header](/api-reference/authentication#generate-signature-to-obtain-access-token-b2b)
+2. Hit Access Token API with proper header request. [Link for Access Token generation sample](/api-reference/authentication#generate-access-token)
 
-[Link for Access Token Handling](/api-reference/authentication#generate-signature-to-obtain-access-token-b2b)
+**Request Sample**
 
-### Signature Handling
+```text
+curl --location 'https://api-sandbox.durian-x.com/v1.0/access-token' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJjZXhfYWdncmVnYXRvcl9zZXJ2aWNlIiwiZXhwIjoxNzcwMDQzNzUwLCJpYXQiOjE3NzAwNDI4NTAsIm1lcmNoYW50X2lkIjoibWVyX2huNXY4MG1Dd0Q2MjI0IiwiZ3JhbnRfdHlwZSI6ImNsaWVudF9jcmVkZW50aWFscyIsImNsaWVudF9pZCI6ImNsaWVudF8zMjYyc053bVVQRnRwN3NndkU2Y20ifQ.SiIf7u96ANBU4RIbNLtJNfwgGs_S6p16bXK3HilvUhQ' \
+--data '{
+    "grantType": "client_credentials"
+}'
+```
 
-[Link for Access Token Handling](/api-reference/authentication#generate-signature-for-transactional-api)
+**Response Sample**
+
+```text
+{
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJjZXhfYWdncmVnYXRvcl9zZXJ2aWNlIiwiZXhwIjoxNzcwMDQzNzUwLCJpYXQiOjE3NzAwNDI4NTAsIm1lcmNoYW50X2lkIjoibWVyX2huNXY4MG1Dd0Q2MjI0IiwiZ3JhbnRfdHlwZSI6ImNsaWVudF9jcmVkZW50aWFscyIsImNsaWVudF9pZCI6ImNsaWVudF8zMjYyc053bVVQRnRwN3NndkU2Y20ifQ.SiIf7u96ANBU4RIbNLtJNfwgGs_S6p16bXK3HilvUhQ",
+    "expiryTime": "2026-02-02T14:49:10.276641426Z"
+}
+```
+
+## [**​**](https://ptnusantaraasethub.mintlify.app/api-reference/authentication#response-definition)
+
+### 2. Handle Transaction Request Header
+
+1. Generate Access token as part of header in the transaction API (Authorization)
+2. Generate Transaction Signature as header information in transaction API (X-Signature). [Link for Access Token Header](/api-reference/authentication#transaction-request-header)
+3. Hit Transaction API with proper header request and body format [Link for Transaction API Header](/api-reference/authentication#transaction-request-header)
+
+### **3.  Crypto Deposits**
+
+**3.1 Create Deposit Address**
+
+If you are testing in sandbox mode, please make sure to include header of X-SANDBOX-DEPOSIT (number value) & X-SANDBOX-SIMULATE-TRX (completed/failed value) to create the success/ failed deposit transaction. This X-Header is not needed in production mode. X-SANDBOX-SIMULATE-TRX will also simulate
+
+- **Request Sample:**
+
+  ```
+  curl --location 'https://api-sandbox.durian-x.com/v1.0/deposits/addresses' \
+  --header 'X-SANDBOX-DEPOSIT: 100' \
+  --header 'X-SANDBOX-SIMULATE-TRX: completed' \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJjZXhfYWdncmVnYXRvcl9zZXJ2aWNlIiwiZXhwIjoxNzcwMDQ4MzM4LCJpYXQiOjE3NzAwNDc0MzgsIm1lcmNoYW50X2lkIjoibWVyX2huNXY4MG1Dd0Q2MjI0IiwiZ3JhbnRfdHlwZSI6ImNsaWVudF9jcmVkZW50aWFscyIsImNsaWVudF9pZCI6ImNsaWVudF8zMjYyc053bVVQRnRwN3NndkU2Y20ifQ.QiPUHl0Kx5Zpzgr6g-vyOPBaWlcYd9ZFDBZJ1s5zDiA' \
+  --data '{
+      "asset": "USDT",
+      "network": "ERC20"
+  }'
+  ```
+
+  **Response Sample:**
+
+  ```
+  {
+      "id": "019c1f0d-0324-7b3e-9bf5-25d85b70df0c",
+      "accountId": "019b968c-2bee-73f3-a7dd-c82f3a8558f7",
+      "asset": "USDT",
+      "network": "ERC20",
+      "address": "0xe8afec6f32fe02375ff6f975cbafab435561858b",
+      "expiredAt": "2026-02-05T15:51:12Z",
+      "memo": "memo123"
+  }
+  ```
+
+**3.2 Deposit Transaction Webhook Handling**
+
+Once a deposit address is created, in sandbox mode, X-SANDBOX-SIMULATE-TRX & X-SANDBOX-DEPOSIT will allow you to simulate webhook creation to your endpoint with event of asset.deposited.
+
+**Webhook Sample**
+
+<CodeGroup>
+
+```json asset.deposited: success
+{
+	"id": "uuidv7",
+	"address": "0xabcdef0123456789",
+	"amount" : "10000.112345",
+	"network": "TRC20",
+	"status": "completed",
+	"createdAt": "2030-12-31T23:59:59+07:00",
+	"finalStatusAt": "2030-12-31T23:59:59+07:00",
+	"status": "completed",
+	"txnHash": "0x12345678abcdef",
+	"signature": "abcedefghijklmn"
+}
+```
+
+
+```json asset.deposited: failed
+{
+	"id": "uuidv7",
+	"address": "0xabcdef0123456789",
+	"amount" : "10000.112345",
+	"network": "TRC20",
+	"createdAt": "2030-12-31T23:59:59+07:00",
+	"finalStatusAt": "2030-12-31T23:59:59+07:00",
+	"status": "failed",
+	"failureReason": "failure reason here"
+}
+```
+
+</CodeGroup>
+
+**Important field to handle:**
+
+- id for DurianX reference, amount as amount of deposit, accountId on
+- Success case field:
+  - status: completed
+  - signature to be verified - [Link for Verifying Webhook Signature](/api-reference/transaction-notification-webhook#validate-webhook-signature)
+  - txnHash as web3 receipt of your transaction
+- Failed case field:
+  - status: failed
+  - signature to be verified - [Link for Verifying Webhook Signature](/api-reference/transaction-notification-webhook#validate-webhook-signature)
+  - failureReason for the reason the transaction is failed
+
+### **4. Quotes**
+
+To execute swap (on/off-ramp) you will be required to quote rate to get current rate and lock the rate. Any quotes originally created will be in active status with transition to expired or used. Quote will have expiry time to be executed marked in expiredAt.
+
+**Request Sample:**
+
+```shellscript
+curl --location 'https://api-sandbox.durian-x.com/v1.0/quotes' \
+--header 'X-SANDBOX-ERROR: QUOTE_INVALID_AMOUNT' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJjZXhfYWdncmVnYXRvcl9zZXJ2aWNlIiwiZXhwIjoxNzcwMDQ4MzM4LCJpYXQiOjE3NzAwNDc0MzgsIm1lcmNoYW50X2lkIjoibWVyX2huNXY4MG1Dd0Q2MjI0IiwiZ3JhbnRfdHlwZSI6ImNsaWVudF9jcmVkZW50aWFscyIsImNsaWVudF9pZCI6ImNsaWVudF8zMjYyc053bVVQRnRwN3NndkU2Y20ifQ.QiPUHl0Kx5Zpzgr6g-vyOPBaWlcYd9ZFDBZJ1s5zDiA' \
+--data '{
+    "sourceAsset": "USDT",
+    "destinationAsset": "IDR",
+    "sourceAmount": "100"
+}'
+```
+
+**Response Sample:**
+
+```json
+{
+    "id": "019c1f19-49fb-74f4-ad2d-d586eb264f61",
+    "sourceAsset": "USDT",
+    "sourceAmount": "100",
+    "destinationAsset": "IDR",
+    "destinationAmount": "1648300",
+    "rate": "16483",
+    "expiredAt": "2026-02-02T16:09:36Z",
+    "status": "active"
+}
+```
+
+**Important field to handle:**
+
+- id : quoteId that will be brought at the swap (on/off ramp level)
+- rate
+- status
+- expiredAt
+
+### **5.  Swaps**
+
+**Create Swap**
+
+Use your active quote to execute a swap for the transaction. referenceId can be used to refer the swap transaction from your end. The created swap will have status of processing which will move to completed/failed
+
+- **Request Sample**
+
+  ```shellscript
+  curl --location 'https://api-sandbox.durian-x.com/v1.0/swaps' \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJjZXhfYWdncmVnYXRvcl9zZXJ2aWNlIiwiZXhwIjoxNzcwMDQ5NTM5LCJpYXQiOjE3NzAwNDg2MzksIm1lcmNoYW50X2lkIjoibWVyX2huNXY4MG1Dd0Q2MjI0IiwiZ3JhbnRfdHlwZSI6ImNsaWVudF9jcmVkZW50aWFscyIsImNsaWVudF9pZCI6ImNsaWVudF8zMjYyc053bVVQRnRwN3NndkU2Y20ifQ.nCzgPQhSOWn7uLXqcdySYBMflV_QMs6Q62UYjXIsWro' \
+  --data '{
+      "quoteId": "019c1f1e-fa9b-745b-b366-3d44281cfd18",
+      "referenceId": "swap_mex_ref_1"
+  }'
+  ```
+- **Response Sample**
+
+  ```json
+  {
+      "id": "019c1f1f-206e-737c-8e44-919f18b83225",
+      "quoteId": "019c1f1e-fa9b-745b-b366-3d44281cfd18",
+      "referenceId": "swap_mex_ref_1",
+      "sourceAsset": "USDT",
+      "sourceAmount": "100",
+      "destinationAsset": "IDR",
+      "destinationAmount": "1648300",
+      "rate": "16483",
+      "status": "processing",
+      "createdAt": "2026-02-02T16:10:59Z"
+  }
+  ```
+
+**Swap Webhook handling**
+
+Once a swap reach final status, webhook will be sent creation to your endpoint with event of swap.executed. In sandbox mode it will be immediately sent once you have successfuly created a swap transaction. 
 
 ## Error Handling and Edge Cases
 
-### Response Code List
-[Link for Access Token Handling](/api-reference/authentication)
+### Response Definition
+
+[Link for Response Definition](/api-reference/authentication#response-definition)
 
 ### Quote Expired
 
@@ -61,137 +253,18 @@ Here's the following failure & retry point you need to handle from your end
   - We currently provide webhook retry. If you have configured the webhook URL, when ack is not received by us, we will retry the webhook for 5 times with exponential interval.
   - If there are any timeout for the transaction / webhook notification, we recommend you check the status of transaction using get API to update your internal status.
 
-## API List
-
-| Category               | API Name                      | URL                             | Method | Description                                                                                  |
-| ---------------------- | ----------------------------- | ------------------------------- | ------ | -------------------------------------------------------------------------------------------- |
-| Supporting Information | Get Supported Digital Asset   | baseUrl/v1.0/assets             | GET    | Return information of digital asset supported & supporting information related to the asset  |
-| Supporting Information | Get Supported Swap Pairs      | baseUrl/v1.0/pairs              | GET    | Return information of swap pairs supported                                                   |
-| Authentication         | Generate Access Token         | baseUrl/v1.0/access-token       | POST   | Get access token as authentication to access transaction API                                 |
-| Accounts               | Get Accounts                  | baseUrl/v1.0/accounts           | GET    | Get list of account & balance of digital asset                                               |
-| Accounts               | Get Account by ID             | baseUrl/v1.0/accounts/:id       | GET    | Get single account & balance of digital asset                                                |
-| Accounts               | Get Account Ledger            | baseUrl/v1.0/accounts/ledgers   | GET    | Get account transaction history and balance of the account                                   |
-| Deposits               | Create Deposit Address        | baseUrl/v1.0/deposits/addresses | POST   | Returns a wallet address where merchants can deposit crypto asset for off-ramp transactions. |
-| Deposits               | Get Deposit Transactions      | baseUrl/v1.0/deposits           | GET    | Return list of deposit transactions ordered from latest to oldest based on createdAt field   |
-| Deposits               | Get Deposit Transaction by ID | baseUrl/v1.0/deposits/:id       | GET    | Return deposit transaction based on id                                                       |
-| Quotes                 | Create Quote                  | baseUrl/v1.0/quotes             | POST   | Get swap rate from one asset to another                                                      |
-| Quotes                 | Get Quotes                    | baseUrl/v1.0/quotes             | GET    | Return list of quotes                                                                        |
-| Quotes                 | Get Quote by ID               | baseUrl/v1.0/quotes/:id         | GET    | Return quote by its ID                                                                       |
-| Swap                   | Create Swap                   | baseUrl/v1.0/swaps              | POST   | Convert based from one asset to another based on quote ID                                    |
-| Swap                   | Get Swaps                     | baseUrl/v1.0/swaps              | GET    | Return list of swaps                                                                         |
-| Swap                   | Get Swap by ID                | baseUrl/v1.0/swaps/:id          | GET    | Return swap by its ID                                                                        |
-
-## Object information:
-
-### **1. Accounts**
-
-Account represent a wallet/ balance for your digital asset. An Account will represent 1 digital asset per provider/CEX.
-
-### **2. Deposits**
-
-Deposit represent both the deposit address and the transaction. Deposit address will be generated for the digital asset, and once there's a transfer to the deposit address, deposit transaction will be created. Successful deposit will add the balance to your digital asset account
-
-**Deposit Transaction Status Lifecycle**
-
-<img
-  src="/images/image-12.png"
-  alt="Image"
-  title="Image"
-  style={{ width:"25%" }}
-/>
-
-| Status    | Definition                                                                                              |
-| :-------- | :------------------------------------------------------------------------------------------------------ |
-| completed | Deposit transaction is success and balance will be credited according to the deposit transaction amount |
-| failed    | Deposit transaction is failed  and your balance will not be credited                                    |
-
-### **3. Quotes**
-
-Quote represent inquiring rate from the provider/ CEX. This quote can then be used to execute the swap transaction (fiat - digital asset, digital asset - fiat , digital asset - digital asset)
-
-**Status Lifecycle**
-
-<img
-  src="/images/image-10.png"
-  alt="Image"
-  title="Image"
-  style={{ width:"20%" }}
-/>
-
-| Status  | Definition                                   |
-| :------ | :------------------------------------------- |
-| active  | Quote is ready to use for transaction        |
-| used    | Quote is already executed for swap           |
-| expired | Quote is expired and cannot be used for swap |
-
-### **4. Swaps**
-
-Swap represent execution of a conversion transaction from fiat - digital asset, digital asset - fiat , digital asset - digital asset. To execute swap , you need to first quote the rate first.
-
-**Status Lifecycle**
-
-<img
-  src="/images/image-11.png"
-  alt="Image"
-  title="Image"
-  style={{ width:"20%" }}
-/>
-
-| Status     | Definition                                         |
-| :--------- | :------------------------------------------------- |
-| processing | Swap initial phase after executed                  |
-| completed  | Swap is successfuly executed by the CEX / partner  |
-| failed     | Swap is failed to be executed by the CEX / partner |
-
-## Off-Ramp Integration Steps
-
-### **0.  Credentials Preparation**
-
-Please follow the guide for credentials preparation on the top of this page
-
-### **1.  Authorization & Signature Handling**
-
-- Generate Access Token
-
-### **2.  Crypto Deposits**
-
-- Create Deposit Address
-- Deposit Transaction Webhook Handling
-
-### **3. Quotes**
-
-- Create Quote
-
-### **4.  Swaps**
-
-- Create Swap
-- Swap Webhook handling
-
-## Webhooks and Events
-
-List of webhook event types supported in NAH side:
-
-| Event           | When it's fired                                                         | Case      |
-| --------------- | ----------------------------------------------------------------------- | --------- |
-| asset.deposited | When a crypto asset is credited to your crypto account in the CEX       | Completed |
-| swap.executed   | When a swap (Crypto - Fiat or Fiat - Crypto) is successfuly processed   | Completed |
-| swap.executed   | When a swap (Crypto - Fiat or Fiat - Crypto) is  processed with failure | Failed    |
-
-- Handling of timeout for webhook/transaction notification.
-  - We currently provide webhook handling for Crypto Deposit transaction & Swap transaction with the following event: swap.executed , asset.deposited. If you have configured the webhook URL, when ack is not received by us, we will retry the webhook for 5 times with exponential interval.
-  - If there are any timeout for the transaction, we recommend you check the status of transaction using get API for the transaction.
-
 ## How to test your implementation
 
 - We provide sandbox environment for you to test your implementation before going live. Currently the sandbox environment is supported only via API
   - Sandbox Base URL: https://api-sandbox.durian-x.com/v1.0
-- To simulate certain error cases in each of the API you can use the following Header to simulate the transaction
+- To simulate certain error cases in each of the API you can use the following header to simulate the transaction
   - X-SANDBOX-ERROR
   - X-SIMULATE-SANDBOX-TRX
 
 ## Sandbox limitations
 
-- For Asset API we currently always set static balance information for the transaction
+- For Asset API we currently always set static balance information for the transaction. The balance will not be affected by sandbox transaction.
+- For Asset Ledger API, it will be set as static sample of ledger. The ledger entry will not be affected by sandbox transaction.
 
 ## Simulating Edge Cases in Sandbox
 
@@ -216,5 +289,3 @@ List of webhook event types supported in NAH side:
 | Simulate Success              | without header value of X-SANDBOX-ERROR | status code 202<br /><br />In Swap transaction, it will be marked as success, swap executed webhook: completed will be sent to the sandbox webhook url |
 | Simulate Insufficient Balance | X-SANDBOX-ERROR = INSUFFICIENT_BALANCE  | status code 422<br /><br />In Swap transaction, it will be marked as failed, swap executed webhook: failed will be sent to the sandbox webhook url     |
 | Simulate Token is Expired     | X-SANDBOX-ERROR = QUOTE_EXPIRED         | status code 404<br /><br />In Swap transaction, it will be marked as failed, swap executed webhook: failed will be sent to the sandbox webhook url     |
-
-[Quickstart guide](/quickstart)
