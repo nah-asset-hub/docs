@@ -32,8 +32,6 @@ List of webhook event types supported in NAH side:
 | swap.executed   | When a swap (Crypto - Fiat or Fiat - Crypto) is successfuly processed   | Completed |
 | swap.executed   | When a swap (Crypto - Fiat or Fiat - Crypto) is  processed with failure | Failed    |
 
-[Link for Webhook Handling](/api-reference/api-reference/transaction-notification-webhook)
-
 ## Off-Ramp Integration Steps
 
 ### 1. Generate Access Token
@@ -58,10 +56,8 @@ curl --location 'https://api-sandbox.durian-x.com/v1.0/access-token' \
 {
     "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJjZXhfYWdncmVnYXRvcl9zZXJ2aWNlIiwiZXhwIjoxNzcwMDQzNzUwLCJpYXQiOjE3NzAwNDI4NTAsIm1lcmNoYW50X2lkIjoibWVyX2huNXY4MG1Dd0Q2MjI0IiwiZ3JhbnRfdHlwZSI6ImNsaWVudF9jcmVkZW50aWFscyIsImNsaWVudF9pZCI6ImNsaWVudF8zMjYyc053bVVQRnRwN3NndkU2Y20ifQ.SiIf7u96ANBU4RIbNLtJNfwgGs_S6p16bXK3HilvUhQ",
     "expiryTime": "2026-02-02T14:49:10.276641426Z"
-}
+}​
 ```
-
-## [**​**](https://ptnusantaraasethub.mintlify.app/api-reference/authentication#response-definition)
 
 ### 2. Handle Transaction Request Header
 
@@ -73,9 +69,7 @@ curl --location 'https://api-sandbox.durian-x.com/v1.0/access-token' \
 
 **3.1 Create Deposit Address**
 
-If you are testing in sandbox mode, please make sure to include header of X-SANDBOX-DEPOSIT (number value) & X-SANDBOX-SIMULATE-TRX (completed/failed value) to create the success/ failed deposit transaction. This X-Header is not needed in production mode. X-SANDBOX-SIMULATE-TRX will also simulate webhook generation.
-[Link for Deposit Transaction Sandbox Simulator](#crypto-deposit)
-
+If you are testing in sandbox mode, please make sure to include header of X-SANDBOX-DEPOSIT (number value) & X-SANDBOX-SIMULATE-TRX (completed/failed value) to create the success/ failed deposit transaction. This X-Header is not needed in production mode. X-SANDBOX-SIMULATE-TRX will also simulate webhook generation. [Link for Deposit Transaction Sandbox Simulator](#crypto-deposit)
 
 - **Request Sample:**
 
@@ -105,7 +99,7 @@ If you are testing in sandbox mode, please make sure to include header of X-SAND
   }
   ```
 
-**3.2 Deposit Transaction Webhook Handling**
+**3.2 Deposit Transaction Webhook Handling** [Deposit Event Webhook Details](/api-reference/transaction-notification-webhook#asset-deposited-event)
 
 Once a deposit address is created, in sandbox mode, X-SANDBOX-SIMULATE-TRX & X-SANDBOX-DEPOSIT will allow you to simulate webhook creation to your endpoint with event of asset.deposited.
 
@@ -123,8 +117,7 @@ Once a deposit address is created, in sandbox mode, X-SANDBOX-SIMULATE-TRX & X-S
 	"createdAt": "2030-12-31T23:59:59+07:00",
 	"finalStatusAt": "2030-12-31T23:59:59+07:00",
 	"status": "completed",
-	"txnHash": "0x12345678abcdef",
-	"signature": "abcedefghijklmn"
+	"txnHash": "0x12345678abcdef"
 }
 ```
 
@@ -149,17 +142,16 @@ Once a deposit address is created, in sandbox mode, X-SANDBOX-SIMULATE-TRX & X-S
 - id for DurianX reference, amount as amount of deposit, accountId on
 - Success case field:
   - status: completed
-  - signature to be verified - [Link for Verifying Webhook Signature](/api-reference/transaction-notification-webhook#validate-webhook-signature)
+  - Header of X-Signature to be verified - [Link for Verifying Webhook Signature](/api-reference/transaction-notification-webhook#validate-webhook-signature)
   - txnHash as web3 receipt of your transaction
 - Failed case field:
   - status: failed
-  - signature to be verified - [Link for Verifying Webhook Signature](/api-reference/transaction-notification-webhook#validate-webhook-signature)
+  - Header of X-Signature to be verified - [Link for Verifying Webhook Signature](/api-reference/transaction-notification-webhook#validate-webhook-signature)
   - failureReason for the reason the transaction is failed
 
 ### **4. Quotes**
 
-To execute swap (on/off-ramp) you will be required to quote rate to get current rate and lock the rate. Any quotes originally created will be in active status with transition to expired or used. Quote will have expiry time to be executed marked in expiredAt.
-[Link for Quotes Sandbox Simulator](#quote)
+To execute swap (on/off-ramp) you will be required to quote rate to get current rate and lock the rate. Any quotes originally created will be in active status with transition to expired or used. Quote will have expiry time to be executed marked in expiredAt. [Link for Quotes Sandbox Simulator](#quote)
 
 **Request Sample:**
 
@@ -201,8 +193,7 @@ curl --location 'https://api-sandbox.durian-x.com/v1.0/quotes' \
 
 **Create Swap**
 
-Use your active quote to execute a swap for the transaction. referenceId can be used to refer the swap transaction from your end. The created swap will have status of processing which will move to completed/failed
-[Link for Swap Sandbox Simulator](#swap)
+Use your active quote to execute a swap for the transaction. referenceId can be used to refer the swap transaction from your end. The created swap will have status of processing which will move to completed/failed [Link for Swap Sandbox Simulator](#swap)
 
 - **Request Sample**
 
@@ -232,9 +223,61 @@ Use your active quote to execute a swap for the transaction. referenceId can be 
   }
   ```
 
-**Swap Webhook handling**
+**Swap Webhook handling** [Swap Event Webhook Details](/api-reference/transaction-notification-webhook#swap-executed-event)
 
-Once a swap reach final status, webhook will be sent creation to your endpoint with event of swap.executed. In sandbox mode it will be immediately sent once you have successfuly created a swap transaction. 
+Once a swap reach final status, webhook will be sent creation to your endpoint with event of swap.executed. In sandbox mode it will be immediately sent once you have successfuly created a swap transaction.
+
+**Sample Webhook:**
+
+<CodeGroup>
+
+```json swap.executed:completed
+{
+  "id": "019c0cc9-5b5a-7509-912c-539969db916b",
+  "quoteId": "019c0cc9-2ef5-7b75-a5a1-15a8bcdac6df",
+  "referenceId": "test-126",
+  "sourceAsset": "USDT",
+  "sourceAmount": "1031.37",
+  "destinationAsset": "IDR",
+  "destinationAmount": "17000000",
+  "rate": "16483",
+  "status": "completed",
+  "createdAt": "2026-01-30T02:44:08Z",
+  "finalStatusAt": "2026-01-30T02:44:10Z"
+}
+```
+
+
+```json swap.executed:failed
+{
+  "id": "019c0d87-f657-77eb-9326-e71a0cacb79a",
+  "quoteId": "019c0cc9-2ef5-7b75-a5a1-15a8bcdac6df",
+  "referenceId": "test-126",
+  "sourceAsset": "USDT",
+  "sourceAmount": "1031.37",
+  "destinationAsset": "IDR",
+  "destinationAmount": "17000000",
+  "rate": "16483",
+  "status": "failed",
+  "createdAt": "2026-01-30T06:12:20Z",
+  "finalStatusAt": "2026-01-30T06:12:20Z",
+  "reason": "insufficient balance"
+}
+```
+
+</CodeGroup>
+
+**Important field to handle:**
+
+- id for DurianX reference
+- Success case field:
+  - status: completed
+  - Header of X-Signature to be verified - [Link for Verifying Webhook Signature](/api-reference/transaction-notification-webhook#validate-webhook-signature)
+  - txnHash as web3 receipt of your transaction
+- Failed case field:
+  - status: failed
+  - Header of X-Signature to be verified - [Link for Verifying Webhook Signature](/api-reference/transaction-notification-webhook#validate-webhook-signature)
+  - failureReason for the reason the transaction is failed
 
 ## Error Handling and Edge Cases
 
