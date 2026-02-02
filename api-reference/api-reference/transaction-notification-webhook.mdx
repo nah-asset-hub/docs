@@ -18,6 +18,234 @@ Here's current supported event from our end:
 | asset.deposited | Crypto Deposit API | When a crypto asset is credited to your crypto account in the CEX                 |
 | swap.executed   | Swap API           | When a swap (Crypto - Fiat or Fiat - Crypto) reach final status (success/failure) |
 
+### **Validate Webhook Signature**
+
+You can find the required structure of the string to be decrypt as below:
+
+```
+<HTTP METHOD> + ":" + <RELATIVE PATH URL> + ":" + LowerCase(HexEncode(SHA-256(Minify(<H
+TTP BODY>)))) + ":" + <X-TIMESTAMP>
+  // Example: POST:/v1.0/balance-inquiry::f806c49e8cd175aa9dd5dd8e0a49648c885954d:2024-05-13T15:07:07+07:00
+```
+
+For example:
+
+Given your webhook URL is https://merchant.com/webhook/asset-deposit and the header and payload as follows
+
+Header
+
+```
+X-Timestamp: 2025-12-15T10:49:49.971172Z
+```
+
+```
+
+{
+	"id":"019b0b0b-76a0-744d-ba52-682ccde1f211",
+	"merchantId":"mer_123",
+	"accountId":"1512630d-f6c1-489b-a957-da5b93df9807",
+	"address":"0x06978f1b3b281827d7d65501f94c0b9affd7bb43",
+	"amount":"10.1",
+	"network":"ERC20",
+	"status":"completed",
+	"asset":"USDT",
+	"txnHash":"0xb4f063ded48ddc4d8236d45b33bd6e4ce18afebc113fc4fd0a5fd439b862cc5b",
+	"createdAt":"2025-12-15T10:49:49.971172Z",
+	"finalStatusAt":"2025-12-15T10:49:49.971172Z",
+	"reason":"successful"
+}
+```
+
+Then the string to sign would be:
+
+```
+POST:/webhook/asset-deposit:f9a8c7e6d5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8:2025-12-15T10:49:49.971+00:00
+```
+
+Where:
+
+- `POST` is the HTTP method
+- `/webhook/asset-deposit` is the relative path (without the domain)
+- `f9a8c7e6d5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8` is the lowercase hex-encoded SHA-256 hash of the minified JSON payload
+- `2024-05-13T15:07:07+07:00` is the X-Timestamp value from the webhook request header
+
+To validate the signature:
+
+1. Compute SHA-256 hash of the minified request body
+2. Convert the hash to lowercase hexadecimal string
+3. Construct the string: `HTTP_METHOD:RELATIVE_PATH:HASH:X_TIMESTAMP`
+4. Encrypt the string using Durianpay’s Public Key
+5. Base64 encode the result
+6. Compare with the X-Signature header value from the webhook request
+
+- Sample Code - Go (Verify with Public Key)
+
+  ```go
+  package main
+  
+  import (
+  	"crypto"
+  	"crypto/rsa"
+  	"crypto/sha256"
+  	"crypto/sha512"
+  	"crypto/x509"
+  	"encoding/base64"
+  	"encoding/hex"
+  	"encoding/json"
+  	"encoding/pem"
+  	"fmt"
+  	"hmac"
+  	"io/ioutil"
+  	"log"
+  )
+  
+  func main() {
+  	// Webhook details
+  	httpMethod := "POST"
+  	relativePath := "/webhook/asset-deposit"
+  	timestamp := "2025-12-15T10:49:49.971+00:00"
+  	publicKeyPath := "./durianpay_public_key.pem" // Path to Durianpay's public key
+  	receivedSignature := "BASE64_ENCODED_SIGNATURE_FROM_HEADER" // X-Signature from webhook header
+  	
+  	// Sample payload
+  	payload := map[string]interface{}{
+  		"id":            "019b0b0b-76a0-744d-ba52-682ccde1f211",
+  		"merchantId":    "mer_123",
+  		"accountId":     "1512630d-f6c1-489b-a957-da5b93df9807",
+  		"address":       "0x06978f1b3b281827d7d65501f94c0b9affd7bb43",
+  		"amount":        "10.1",
+  		"network":       "ERC20",
+  		"status":        "completed",
+  		"asset":         "USDT",
+  		"txnHash":       "0xb4f063ded48ddc4d8236d45b33bd6e4ce18afebc113fc4fd0a5fd439b862cc5b",
+  		"createdAt":     "2025-12-15 10:49:49.971172 +0000 UTC",
+  		"finalStatusAt": "2025-12-15 10:49:49.971172 +0000 UTC",
+  		"reason":        "successful",
+  	}
+  	
+  	// Step 1: Minify JSON payload
+  	minified, err := json.Marshal(payload)
+  	if err != nil {
+  		log.Fatalf("Failed to marshal payload: %v", err)
+  	}
+  	
+  	// Step 2: Compute SHA-256 hash of minified payload
+  	hash := sha256.Sum256(minified)
+  	hashHex := hex.EncodeToString(hash[:])
+  	
+  	// Step 3: Construct string to verify
+  	stringToVerify := fmt.Sprintf("%s:%s:%s:%s", httpMethod, relativePath, hashHex, timestamp)
+  	fmt.Println("String to verify:", stringToVerify)
+  	
+  	// Step 4: Read Durianpay's public key
+  	pubKeyBytes, err := ioutil.ReadFile(publicKeyPath)
+  	if err != nil {
+  		log.Fatalf("Failed to read public key file: %v", err)
+  	}
+  	
+  	block, _ := pem.Decode(pubKeyBytes)
+  	if block == nil || block.Type != "PUBLIC KEY" {
+  		log.Fatal("Failed to decode PEM block containing public key")
+  	}
+  	
+  	pubKeyInterface, err := x509.ParsePKIXPublicKey(block.Bytes)
+  	if err != nil {
+  		log.Fatalf("Failed to parse public key: %v", err)
+  	}
+  	
+  	pubKey, ok := pubKeyInterface.(*rsa.PublicKey)
+  	if !ok {
+  		log.Fatal("Not an RSA public key")
+  	}
+  	
+  	// Step 5: Decode the received signature from base64
+  	signatureBytes, err := base64.StdEncoding.DecodeString(receivedSignature)
+  	if err != nil {
+  		log.Fatalf("Failed to decode signature: %v", err)
+  	}
+  	
+  	// Step 6: Hash the string to verify using SHA-256
+  	stringHash := sha256.Sum256([]byte(stringToVerify))
+  	
+  	// Step 7: Verify the signature using RSA public key
+  	err = rsa.VerifyPKCS1v15(pubKey, crypto.SHA256, stringHash[:], signatureBytes)
+  	if err != nil {
+  		log.Fatalf("Signature verification failed: %v", err)
+  		fmt.Println("Signature is INVALID")
+  	} else {
+  		fmt.Println("Signature is VALID")
+  	}
+  }
+  
+  ```
+- Sample Code - Node.js (Verify with Public Key)
+
+  ```javascript
+  const crypto = require('crypto');
+  const fs = require('fs');
+  
+  function verifyWebhookSignature() {
+      // Webhook details
+      const httpMethod = "POST";
+      const relativePath = "/webhook/asset-deposit";
+      const timestamp = "2025-12-15T10:49:49.971+00:00";
+      const publicKeyPath = "./durianpay_public_key.pem"; // Path to Durianpay's public key
+      const receivedSignature = "BASE64_ENCODED_SIGNATURE_FROM_HEADER"; // X-Signature from webhook header
+      
+      // Sample payload
+      const payload = {
+          id: "019b0b0b-76a0-744d-ba52-682ccde1f211",
+          merchantId: "mer_123",
+          accountId: "1512630d-f6c1-489b-a957-da5b93df9807",
+          address: "0x06978f1b3b281827d7d65501f94c0b9affd7bb43",
+          amount: "10.1",
+          network: "ERC20",
+          status: "completed",
+          asset: "USDT",
+          txnHash: "0xb4f063ded48ddc4d8236d45b33bd6e4ce18afebc113fc4fd0a5fd439b862cc5b",
+          createdAt: "2025-12-15 10:49:49.971172 +0000 UTC",
+          finalStatusAt: "2025-12-15 10:49:49.971172 +0000 UTC",
+          reason: "successful"
+      };
+      
+      // Step 1: Minify JSON payload
+      const minified = JSON.stringify(payload);
+      
+      // Step 2: Compute SHA-256 hash of minified payload
+      const hashHex = crypto.createHash('sha256').update(minified).digest('hex');
+      
+      // Step 3: Construct string to verify
+      const stringToVerify = `${httpMethod}:${relativePath}:${hashHex}:${timestamp}`;
+      console.log("String to verify:", stringToVerify);
+      
+      // Step 4: Read Durianpay's public key
+      const publicKey = fs.readFileSync(publicKeyPath, 'utf8');
+      
+      // Step 5: Decode the received signature from base64
+      const signatureBuffer = Buffer.from(receivedSignature, 'base64');
+      
+      // Step 6: Verify the signature using RSA public key
+      const verifier = crypto.createVerify('SHA256');
+      verifier.update(stringToVerify);
+      verifier.end();
+      
+      const isValid = verifier.verify(publicKey, signatureBuffer);
+      
+      if (isValid) {
+          console.log("Signature is VALID");
+          return true;
+      } else {
+          console.log("Signature is INVALID");
+          return false;
+      }
+  }
+  
+  verifyWebhookSignature();
+  
+  ```
+
+## 
+
 ## List of Webhook Event
 
 ### Asset Deposited Event
