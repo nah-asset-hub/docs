@@ -22,7 +22,7 @@
         "tab": "API reference",
         "pages": [
           "api-reference/introduction-1",
-          "api-reference/authentication",
+          "api-reference/introduction",
           {
             "group": "API Reference",
             "icon": "wrench",

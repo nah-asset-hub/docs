@@ -1,10 +1,9 @@
 ---
 title: "Integration Guide"
-description: "This page will explain the integration steps/ information for you to implement our API efficiently"
 icon: "chart-network"
 ---
 
-## Integration Overview
+## Integration Preparation
 
 - We  currently provide REST API with OAuth 2.0 for authorization.
 - We differentiate between sandbox & production API so you can safely test your implementation in sandbox mode. Sandbox environment will not initiate any real transaction and it's designed for testing purposes. Sandbox Base URL: https://api-sandbox.durian-x.com/v1.0
@@ -14,14 +13,7 @@ icon: "chart-network"
     - Sandbox Secret Key
     - Sandbox Public key of NAH
   - Prepare Sandbox Webhook URL
-  - Prepare your own Sandbox Private & Public Key. Step to generate your private key and public key is as following.
-
-  ```shellscript
-  # generate merchant's private key
-  openssl genrsa -out client.key 2048
-  # Generate Public Key
-  openssl rsa -in rsa_private_key.pem -out rsa_public_key.pem -pubout
-  ```
+  - Prepare your own Sandbox Private & Public Key. To generate your private key and public key, please follow this [link](/api-reference/introduction-1)
 
   _Please store your private key securely. The public key will need to be shared to NAH._
   - Request for sandbox setup to NAH. \
