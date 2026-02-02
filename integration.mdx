@@ -43,7 +43,7 @@ icon: "chart-network"
 
 ### Access Token Handling
 
-TBC
+[Resources for Access Token Handling](#api-reference/introduction)
 
 ### Signature Handling
 
@@ -89,25 +89,25 @@ Here's the following failure & retry point you need to handle from your end
 
 ## API List
 
-| Category               | API Name                      | URL                               | Method | Description                                                                                  |
-| ---------------------- | ----------------------------- | --------------------------------- | ------ | -------------------------------------------------------------------------------------------- |
-| Supporting Information | Get Supported Digital Asset   | baseUrl/v1.0/assets               | GET    | Return information of digital asset supported & supporting information related to the asset  |
-| Supporting Information | Get Supported Swap Pairs      | baseUrl/v1.0/pairs                | GET    | Return information of swap pairs supported                                                   |
-| Authentication         | Generate Access Token         | {baseUrl}/v1.0/access-token       | POST   | Get access token as authentication to access transaction API                                 |
-| Accounts               | Get Accounts                  | baseUrl/v1.0/accounts             | GET    | Get list of account & balance of digital asset                                               |
-| Accounts               | Get Account by ID             | baseUrl/v1.0/accounts/:id         | GET    | Get single account & balance of digital asset                                                |
-| Accounts               | Get Account Ledger            | {baseUrl}/v1.0/accounts/ledgers   | GET    | Get account transaction history and balance of the account                                   |
-| Deposits               | Create Deposit Address        | {baseUrl}/v1.0/deposits/addresses | POST   | Returns a wallet address where merchants can deposit crypto asset for off-ramp transactions. |
-| Deposits               | Get Deposit Transactions      | {baseUrl}/v1.0/deposits           | GET    | Return list of deposit transactions ordered from latest to oldest based on createdAt field   |
-| Deposits               | Get Deposit Transaction by ID | {baseUrl}/v1.0/deposits/:id       | GET    | Return deposit transaction based on id                                                       |
-| Quotes                 | Create Quote                  | {baseUrl}/v1.0/quotes             | POST   | Get swap rate from one asset to another                                                      |
-| Quotes                 | Get Quotes                    | {baseUrl}/v1.0/quotes             | GET    | Return list of quotes                                                                        |
-| Quotes                 | Get Quote by ID               | {baseUrl}/v1.0/quotes/:id         | GET    | Return quote by its ID                                                                       |
-| Swap                   | Create Swap                   | {baseUrl}/v1.0/swaps              | POST   | Convert based from one asset to another based on quote ID                                    |
-| Swap                   | Get Swaps                     | {baseUrl}/v1.0/swaps              | GET    | Return list of swaps                                                                         |
-| Swap                   | Get Swap by ID                | {baseUrl}/v1.0/swaps/:id          | GET    | Return swap by its ID                                                                        |
+| Category               | API Name                      | URL                             | Method | Description                                                                                  |
+| ---------------------- | ----------------------------- | ------------------------------- | ------ | -------------------------------------------------------------------------------------------- |
+| Supporting Information | Get Supported Digital Asset   | baseUrl/v1.0/assets             | GET    | Return information of digital asset supported & supporting information related to the asset  |
+| Supporting Information | Get Supported Swap Pairs      | baseUrl/v1.0/pairs              | GET    | Return information of swap pairs supported                                                   |
+| Authentication         | Generate Access Token         | baseUrl/v1.0/access-token       | POST   | Get access token as authentication to access transaction API                                 |
+| Accounts               | Get Accounts                  | baseUrl/v1.0/accounts           | GET    | Get list of account & balance of digital asset                                               |
+| Accounts               | Get Account by ID             | baseUrl/v1.0/accounts/:id       | GET    | Get single account & balance of digital asset                                                |
+| Accounts               | Get Account Ledger            | baseUrl/v1.0/accounts/ledgers   | GET    | Get account transaction history and balance of the account                                   |
+| Deposits               | Create Deposit Address        | baseUrl/v1.0/deposits/addresses | POST   | Returns a wallet address where merchants can deposit crypto asset for off-ramp transactions. |
+| Deposits               | Get Deposit Transactions      | baseUrl/v1.0/deposits           | GET    | Return list of deposit transactions ordered from latest to oldest based on createdAt field   |
+| Deposits               | Get Deposit Transaction by ID | baseUrl/v1.0/deposits/:id       | GET    | Return deposit transaction based on id                                                       |
+| Quotes                 | Create Quote                  | baseUrl/v1.0/quotes             | POST   | Get swap rate from one asset to another                                                      |
+| Quotes                 | Get Quotes                    | baseUrl/v1.0/quotes             | GET    | Return list of quotes                                                                        |
+| Quotes                 | Get Quote by ID               | baseUrl/v1.0/quotes/:id         | GET    | Return quote by its ID                                                                       |
+| Swap                   | Create Swap                   | baseUrl/v1.0/swaps              | POST   | Convert based from one asset to another based on quote ID                                    |
+| Swap                   | Get Swaps                     | baseUrl/v1.0/swaps              | GET    | Return list of swaps                                                                         |
+| Swap                   | Get Swap by ID                | baseUrl/v1.0/swaps/:id          | GET    | Return swap by its ID                                                                        |
 
-### Object information:
+## Object information:
 
 ### **1. Accounts**
 
@@ -242,3 +242,5 @@ List of webhook event types supported in NAH side:
 | Simulate Success              | without header value of X-SANDBOX-ERROR | status code 202<br /><br />In Swap transaction, it will be marked as success, swap executed webhook: completed will be sent to the sandbox webhook url |
 | Simulate Insufficient Balance | X-SANDBOX-ERROR = INSUFFICIENT_BALANCE  | status code 422<br /><br />In Swap transaction, it will be marked as failed, swap executed webhook: failed will be sent to the sandbox webhook url     |
 | Simulate Token is Expired     | X-SANDBOX-ERROR = QUOTE_EXPIRED         | status code 404<br /><br />In Swap transaction, it will be marked as failed, swap executed webhook: failed will be sent to the sandbox webhook url     |
+
+[Quickstart guide](/quickstart)
