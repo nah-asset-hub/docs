@@ -554,7 +554,20 @@
             "example": "ERR_001"
           }
         }
-      }
+      },
+      "UnauthorizedError": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string",
+              "message": "UNAUTHORIZED"
+            },
+            "message": {
+              "type": "string",
+              "message": "authentication failed"
+            }
+          }
+        },
     },
     "parameters": {
       "idParam": {
@@ -669,7 +682,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/UnauthorizedError"
                 }
               }
             }
