@@ -69,6 +69,10 @@
           "accessToken": {
             "type": "string",
             "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          },
+          "expiryTime": {
+            "type": "string",
+            "example": "2026-02-03T10:30:00Z"
           }
         }
       },
