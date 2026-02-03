@@ -799,7 +799,14 @@
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized - Invalid credentials or signature",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
           }
         }
       }
