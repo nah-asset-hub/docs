@@ -12,14 +12,14 @@ icon: "chart-network"
   - Sandbox Account - you can request account creation via our BD team [sales@durian-x.com](mailto:sales@durian-x.com). After account creation we will share to you
     - Sandbox X-CLIENT-ID
     - Sandbox Secret Key
-    - Sandbox Public key of NAH
+    - Sandbox Public Certificate of NAH
   - Prepare Sandbox Webhook URL
-  - Prepare your own Sandbox Private & Public Key. To generate your private key and public key, please follow this [link](/api-reference/authentication#credential-setup). We highly recommend to differentiate sandbox and production key.
+  - Prepare your own Sandbox Private Key & Public Certificate. To generate your private key and public certificate, please follow this [link](/api-reference/authentication#credential-setup). We highly recommend to differentiate sandbox and production key.
 
-  _Please store your private key securely. The public key will need to be shared to NAH._
+  _Please store your private key securely. The public certificate will need to be shared to NAH._
   - Request for sandbox setup to NAH. \
     To setup your sandbox settings, you can send an email to [support@durian-x.com](mailto:support@durian-x.com) with the following Subject: "Request for sandbox configuration". The request should include
-    - Sandbox Public Key to be shared to us in encrypted file to \<TBC Tech Onboarding Email\>. Password to be shared in different channel / same channel (i.e. Email, Whatsapp, Telegram) with different PIC
+    - Sandbox Public Certificate to be shared to us in encrypted file to \<TBC Tech Onboarding Email\>. Password to be shared in different channel / same channel (i.e. Email, Whatsapp, Telegram) with different PIC
     - Sandbox Webhook URL
 
 ## Webhooks and Events
@@ -44,6 +44,8 @@ List of webhook event types supported in NAH side:
 ```text
 curl --location 'https://api-sandbox.durian-x.com/v1.0/access-token' \
 --header 'Content-Type: application/json' \
+--header 'X-TIMESTAMP: 2024-05-13T15:32:36.422+07:00' \
+--header 'X-SIGNATURE: KLJ9KthaIiZSzPqHUMuJRsKOZtYCqqWd5DhfWqYC7OjZ2Qlu0PvQ2wRQF5vfDWsz/qFYEexOXb47+oQBjMhAz4XRNhXBBfwoWxrGTG8iU8EYSDVfChW0NqAWjWIQolhB4UcHn5SybPFRON3rvAOIQTzuEshUA1PNAln8jOKaRmY=' \
 --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJjZXhfYWdncmVnYXRvcl9zZXJ2aWNlIiwiZXhwIjoxNzcwMDQzNzUwLCJpYXQiOjE3NzAwNDI4NTAsIm1lcmNoYW50X2lkIjoibWVyX2huNXY4MG1Dd0Q2MjI0IiwiZ3JhbnRfdHlwZSI6ImNsaWVudF9jcmVkZW50aWFscyIsImNsaWVudF9pZCI6ImNsaWVudF8zMjYyc053bVVQRnRwN3NndkU2Y20ifQ.SiIf7u96ANBU4RIbNLtJNfwgGs_S6p16bXK3HilvUhQ' \
 --data '{
     "grantType": "client_credentials"

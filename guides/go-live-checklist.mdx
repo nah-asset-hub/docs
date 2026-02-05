@@ -1,26 +1,23 @@
 ---
 title: "Go Live Checklist"
-description: "This page will explain the details on what you need to check before going live with us"
 icon: "transporter-1"
 ---
 
 ## Production Access
 
-Production access will be given after you have submitted all required document and pass KYC/KYB process from our end and CEX side. Once the onboarding is approved, we will initiate the credentials sharing with the details shared in the preparation.
-
-Expect 1 week working days SLA after document submission if there are no feedback for the document from provider/ partner.
+Production access will be given after you have submitted all required document and pass KYC/KYB process from our end and CEX side. Expect 1 week working days SLA after document submission if there are no feedback for the document from provider/ partner. Once the onboarding is approved, we will initiate the production credentials sharing with the details shared below.
 
 - Credentials needed to go live:
   - Credentials shared from our side (NAH):
     - Production X-CLIENT-ID
     - Production Secret Key / API Key
-    - Production Public key of NAH
+    - Production Public Certificate of NAH
   - Credentials to prepare from your end:
     - Your Production Webhook URL
-    - Your Production Private & Public Key
+    - Your Production Private Key & Public Certificate
 - Request for production configuration to NAH. \
   To setup your sandbox settings, you can send an email to \<TBC Tech Onboarding Email\> with the following Subject: "Request for production configuration". The request should include
-  - Production Public Key to be shared to us in encrypted file to \<TBC Tech Onboarding Email\>. Password to be shared in different channel / same channel (i.e. Email, Whatsapp, Telegram) with different PIC
+  - Production Public Certificate to be shared to us in encrypted file to \<TBC Tech Onboarding Email\>. Password to be shared in different channel / same channel (i.e. Email, Whatsapp, Telegram) with different PIC
   - Production Webhook URL
   - IP Whitelist for production access (only registered IP address can access your account via API)
 
@@ -28,28 +25,28 @@ Expect 1 week working days SLA after document submission if there are no feedbac
 
 To share credentials to your end, NAH will share the following information to you via admin/ first registered account on our end.
 
-- The credentials will need to be encrypted with NAH's public key and signed with Merchant's private key.
-- NAH will verify the signature of the credentials using merchant's shared public key
+- The credentials will need to be encrypted with NAH's public certificate and signed with Merchant's private key.
+- NAH will verify the signature of the credentials using merchant's shared public certificate
 
-In order to do this, you will need to share your public key to NAH, and NAH will share NAH's public key to your side.
+In order to do this, you will need to share your public certificate to NAH, and NAH will share NAH's public certificate to your side.
 
 ## Preparation Checklist
 
 To share the information to NAH, please use your admin email and send the request to \<[xxxxxx@xxx.com](mailto:xxxxxx@xxx.com)\>
 
-1. Receive NAH Public Key & Configure it internally
-2. Sharing your Public Key to us
-3. Receive Production API key/Secret Key credentials - Encrypted with your public key and signed with NAH private key
+1. Receive NAH Public Certificate & Configure it internally
+2. Sharing your Public Certificate to us
+3. Receive Production Secret Key  - Encrypted with your public certificate and signed with NAH private key
 4. Sharing your Webhook URL to be configured in NAH side
 5. Sharing your IP Address to be whitelisted to be configured in NAH side
 6. Re-confirm your registered Withdrawal/Settlement Accounts
 7. Using Production API URL for production transaction
 
-## Live Day
+## Recommended Production Testing
 
 - Simulate success flow of the API & Webhook handling (i.e. success swap/ crypto deposit)
   - Asset API
   - Crypto Deposit API & Webhook
   - Quote API
-  - Swap API & Webhook
+  - Swap API & Webhook (include insufficient balance case & invalid /expired quote testing)
 - Escalation Channel: A group channel will be created to raise any issue via Whatsapp/Telegram.
