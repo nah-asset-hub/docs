@@ -160,7 +160,8 @@
           }
         }
       },
-      "Deposit": {
+      "DepositSuccess": {
+        "title": "Success",
         "type": "object",
         "properties": {
           "id": {
@@ -210,19 +211,83 @@
             "type": "string",
             "format": "date-time",
             "example": "2024-01-27T10:30:00Z"
+          }
+        }
+      },
+      "DepositFailed": {
+        "title": "Failed",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "019b9b87-463a-7195-9641-2dd4eb3c862e"
+          },
+          "accountId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "10000000-0000-0000-0000-000000000001"
+          },
+          "asset": {
+            "type": "string",
+            "example": "USDT"
+          },
+          "network": {
+            "type": "string",
+            "example": "ERC20"
+          },
+          "address": {
+            "type": "string",
+            "example": "0x1234567890abcdef..."
+          },
+          "memo": {
+            "type": "string",
+            "example": "10594322"
+          },
+          "amount": {
+            "type": "string",
+            "example": "100.00"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "completed",
+              "failed"
+            ],
+            "example": "failed"
+          },
+          "txnHash": {
+            "type": "string",
+            "example": "0xabcdef1234567890..."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-27T10:30:00Z"
           },
           "finalStatusAt": {
             "type": "string",
             "format": "date-time",
-            "description": "Present only when status is completed",
+            "description": "Present only when status is completed/failed",
             "example": "2024-01-27T10:30:00Z"
           },
           "reason": {
             "type": "string",
             "description": "Present only when status is failed",
-            "example": "INSUFFICIENT_BALANCE"
+            "example": "Error reason"
           }
         }
+      },
+      "Deposit": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/DepositSuccess"
+          },
+          {
+            "$ref": "#/components/schemas/DepositFailed"
+          }
+        ]
       },
       "DepositAddressRequest": {
         "type": "object",
@@ -254,10 +319,6 @@
             "format": "uuid",
             "example": "10000000-0000-0000-0000-000000000001"
           },
-          "address": {
-            "type": "string",
-            "example": "0x1234567890abcdef..."
-          },
           "asset": {
             "type": "string",
             "example": "USDT"
@@ -265,6 +326,10 @@
           "network": {
             "type": "string",
             "example": "ERC20"
+          },
+          "address": {
+            "type": "string",
+            "example": "0x1234567890abcdef..."
           },
           "memo": {
             "type": "string",
@@ -405,7 +470,8 @@
           }
         ]
       },
-      "Swap": {
+      "SwapProcessing": {
+        "title": "Processing",
         "type": "object",
         "properties": {
           "id": {
@@ -450,6 +516,55 @@
               "failed"
             ],
             "example": "processing"
+          }
+        }
+      },
+      "SwapFailed": {
+        "title": "Failed",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "019bbbe6-3672-73fb-a8f7-32442be7b39c"
+          },
+          "quoteId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "019bb30b-53e0-7183-afe9-17bdaf2209d8"
+          },
+          "referenceId": {
+            "type": "string",
+            "example": "mex-ref-1230-test-1"
+          },
+          "sourceAsset": {
+            "type": "string",
+            "example": "USDT"
+          },
+          "sourceAmount": {
+            "type": "string",
+            "example": "100.00"
+          },
+          "destinationAsset": {
+            "type": "string",
+            "example": "IDR"
+          },
+          "destinationAmount": {
+            "type": "string",
+            "example": "1500000.00"
+          },
+          "rate": {
+            "type": "string",
+            "example": "15000.00"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "completed",
+              "processing",
+              "failed"
+            ],
+            "example": "failed"
           },
           "createdAt": {
             "type": "string",
@@ -459,7 +574,7 @@
           "finalStatusAt": {
             "type": "string",
             "format": "date-time",
-            "description": "Present only when status is completed",
+            "description": "Present only when status is completed/failed",
             "example": "2024-01-27T10:30:00Z"
           },
           "reason": {
@@ -468,6 +583,83 @@
             "example": "INSUFFICIENT_BALANCE"
           }
         }
+      },
+      "SwapCompleted": {
+        "title": "Completed",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "019bbbe6-3672-73fb-a8f7-32442be7b39c"
+          },
+          "quoteId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "019bb30b-53e0-7183-afe9-17bdaf2209d8"
+          },
+          "referenceId": {
+            "type": "string",
+            "example": "mex-ref-1230-test-1"
+          },
+          "sourceAsset": {
+            "type": "string",
+            "example": "USDT"
+          },
+          "sourceAmount": {
+            "type": "string",
+            "example": "100.00"
+          },
+          "destinationAsset": {
+            "type": "string",
+            "example": "IDR"
+          },
+          "destinationAmount": {
+            "type": "string",
+            "example": "1500000.00"
+          },
+          "rate": {
+            "type": "string",
+            "example": "15000.00"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "completed",
+              "processing",
+              "failed"
+            ],
+            "example": "completed"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-27T10:30:00Z"
+          }
+        }
+      },
+      "Swaps": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/SwapProcessing"
+          },
+          {
+            "$ref": "#/components/schemas/SwapFailed"
+          },
+          {
+            "$ref": "#/components/schemas/SwapCompleted"
+          }
+        ]
+      },
+      "SwapResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SwapProcessing"
+          },
+          {
+            "$ref": "#/components/schemas/SwapFailed"
+          }
+        ]
       },
       "SwapRequest": {
         "type": "object",
@@ -967,14 +1159,9 @@
                 "schema": {
                   "$ref": "#/components/schemas/BadRequest"
                 },
-                "examples": {
-                  "BAD_REQUEST": {
-                    "summary": "Bad request",
-                    "value": {
-                      "code": "BAD_REQUEST",
-                      "message": "invalid account id"
-                    }
-                  }
+                "example": {
+                  "code": "BAD_REQUEST",
+                  "message": "invalid account id"
                 }
               }
             }
@@ -1107,7 +1294,7 @@
             }
           },
           "400": {
-            "description": "Invalid request",
+            "description": "Invalid request. Possible error codes: BAD_REQUEST, VALIDATION_ERROR",
             "content": {
               "application/json": {
                 "schema": {
@@ -1202,10 +1389,7 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Deposit"
-                      }
+                      "$ref": "#/components/schemas/Deposit"
                     },
                     "pagination": {
                       "$ref": "#/components/schemas/Pagination"
@@ -1350,7 +1534,7 @@
             }
           },
           "400": {
-            "description": "Invalid request",
+            "description": "Invalid request. Possible error codes: BAD_REQUEST, VALIDATION_ERROR",
             "content": {
               "application/json": {
                 "schema": {
@@ -1561,7 +1745,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Swap"
+                  "$ref": "#/components/schemas/SwapProcessing"
                 }
               }
             }
@@ -1587,27 +1771,15 @@
             }
           },
           "404": {
-            "description": "Not found",
+            "description": "Not found. Possible error codes: NOT_FOUND, QUOTE_NOT_FOUND_OR_EXPIRED",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 },
-                "examples": {
-                  "NOT_FOUND": {
-                    "summary": "Bank info not found or invalid",
-                    "value": {
-                      "code": "NOT_FOUND",
-                      "message": "merchant withdrawal bank info is not found or valid"
-                    }
-                  },
-                  "QUOTE_NOT_FOUND_OR_EXPIRED": {
-                    "summary": "Quote not found or expired",
-                    "value": {
-                      "code": "QUOTE_NOT_FOUND_OR_EXPIRED",
-                      "message": "quoteId is invalid or expired"
-                    }
-                  }
+                "example": {
+                  "code": "QUOTE_NOT_FOUND_OR_EXPIRED",
+                  "message": "quoteId is invalid or expired"
                 }
               }
             }
@@ -1619,14 +1791,9 @@
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 },
-                "examples": {
-                  "INSUFFICIENT_BALANCE": {
-                    "summary": "Insufficient balance",
-                    "value": {
-                      "code": "INSUFFICIENT_BALANCE",
-                      "message": "Insufficient balance"
-                    }
-                  }
+                "example": {
+                  "code": "INSUFFICIENT_BALANCE",
+                  "message": "Insufficient balance"
                 }
               }
             }
@@ -1673,41 +1840,30 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/Swap"
-                      }
+                      "$ref": "#/components/schemas/Swaps"
                     },
                     "pagination": {
                       "$ref": "#/components/schemas/Pagination"
                     }
                   }
                 },
-                "examples": {
-                  "failedSwap": {
-                    "summary": "Failed swap",
-                    "value": {
-                      "data": [
-                        {
-                          "id": "019bbbe6-3672-73fb-a8f7-32442be7b39c",
-                          "quoteId": "019bb30b-53e0-7183-afe9-17bdaf2209d8",
-                          "referenceId": "mex-ref-1230-test-1",
-                          "sourceAsset": "USDT",
-                          "sourceAmount": "100.00",
-                          "destinationAsset": "IDR",
-                          "destinationAmount": "1500000.00",
-                          "rate": "15000.00",
-                          "status": "failed",
-                          "createdAt": "2024-01-27T10:30:00Z",
-                          "finalStatusAt": "2024-01-27T10:35:00Z",
-                          "reason": "INSUFFICIENT_BALANCE"
-                        }
-                      ],
-                      "pagination": {
-                        "page": 1,
-                        "limit": 10
-                      }
+                "example": {
+                  "data": [
+                    {
+                      "id": "019bbbe6-3672-73fb-a8f7-32442be7b39c",
+                      "quoteId": "019bb30b-53e0-7183-afe9-17bdaf2209d8",
+                      "referenceId": "mex-ref-1230-test-1",
+                      "sourceAsset": "USDT",
+                      "sourceAmount": "100.00",
+                      "destinationAsset": "IDR",
+                      "destinationAmount": "1500000.00",
+                      "rate": "15000.00",
+                      "status": "processing"
                     }
+                  ],
+                  "pagination": {
+                    "page": 1,
+                    "limit": 10
                   }
                 }
               }
@@ -1761,7 +1917,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Swap"
+                  "$ref": "#/components/schemas/SwapProcessing"
                 }
               }
             }
